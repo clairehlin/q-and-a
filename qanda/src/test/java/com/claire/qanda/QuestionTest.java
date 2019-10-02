@@ -63,7 +63,6 @@ class QuestionTest {
         List<WebElement> elements = driver.findElements(By.xpath("//*")).stream()
                 .filter(e -> e.getTagName().equals("input"))
                 .collect(toList());
-        Thread.sleep(5000);
         for (WebElement element : elements) {
             if (element.getTagName().equals("input") && element.getAttribute("type").equals("email")) {
                 System.out.println(element.getTagName());
