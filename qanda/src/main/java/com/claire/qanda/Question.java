@@ -6,8 +6,11 @@ public class Question {
     private final QType type;
 
     public Question(String statement, QType type) {
-        if (statement.isEmpty()) {
+        if (statement.trim().isEmpty()) {
             throw new IllegalArgumentException("cannot accept empty Question statement");
+        }
+        if(type == null) {
+            throw new NullPointerException("cannot initialize question without a type");
         }
         this.statement = statement;
         this.type = type;
