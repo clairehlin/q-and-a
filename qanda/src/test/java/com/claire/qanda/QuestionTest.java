@@ -1,5 +1,6 @@
 package com.claire.qanda;
 
+import io.github.artsok.RepeatedIfExceptionsTest;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -7,10 +8,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class QuestionTest {
 
@@ -53,34 +53,35 @@ class QuestionTest {
         );
     }
 
-    @Test
+
+    @RepeatedIfExceptionsTest(repeats = 2)
     void google_test() throws InterruptedException {
+        WebDriver driver = preparedWebDriver();
+        WebDriver frame = prepareInputFrame(driver);
+        WebElement emailInput = input(frame, "//input[@type='email']");
+        WebElement submitInput = input(frame, "//input[@type='submit']");
+        emailInput.sendKeys("abcdefg");
+        Thread.sleep(1000);
+        submitInput.click();
+    }
+
+    private WebElement input(WebDriver frame, String s) {
+        return frame.findElements(By.xpath(s)).iterator().next();
+    }
+
+    private WebDriver prepareInputFrame(WebDriver driver) {
+        List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+        int iframeCount = iframes.size();
+        return driver.switchTo().frame(iframes.get(iframeCount - 1));
+    }
+
+    private WebDriver preparedWebDriver() {
         System.setProperty("webdriver.chrome.driver", "/home/moran/dev/q-and-a/qanda/chromedriver");
         WebDriver driver = new ChromeDriver();
         driver.manage().window().maximize();
-//        driver.get("https://www.linkedin.com/login");
         driver.get("https://onedrive.live.com/about/en-us/signin/");
-        List<WebElement> elements = driver.findElements(By.xpath("//*")).stream()
-                .filter(e -> e.getTagName().equals("input"))
-                .collect(toList());
-        for (WebElement element : elements) {
-            if (element.getTagName().equals("input") && element.getAttribute("type").equals("email")) {
-                System.out.println(element.getTagName());
-                System.out.println(element.getAttribute("type"));
-                System.out.println("text: " + element.getText());
-                element.click();
-                element.sendKeys("abcdefg@abcdefg.com");
-            }
-        }
-//        System.out.println(elements);
-//        WebElement username = driver.findElement(By.id("username"));
-//        WebElement password = driver.findElement(By.id("password"));
-//        WebElement login = driver.findElement(By.xpath("//button[text()='Sign in']"));
-//        username.sendKeys("example@gmail.com");
-//        password.sendKeys("password");
-//        login.click();
-//        String actualUrl = "https://www.linkedin.com/feed/";
-//        String expectedUrl = driver.getCurrentUrl();
-//        assertEquals(expectedUrl, actualUrl);
+        return driver;
     }
+
 }
+
