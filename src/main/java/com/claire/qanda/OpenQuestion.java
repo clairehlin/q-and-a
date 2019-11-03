@@ -10,7 +10,7 @@ public class OpenQuestion {
     }
 
     private void validateStatementNotEmpty(String statement) {
-        if(statement.isEmpty()){
+        if (statement.trim().isEmpty()) {
             throw new IllegalArgumentException("cannot accept empty statement");
         }
     }
