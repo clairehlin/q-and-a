@@ -1,6 +1,7 @@
 package com.claire.qanda;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,6 +46,16 @@ class QuestionTest {
                 () -> new Question("abc", null)
         );
     }
+
+    @Test
+    void should_not_accept_long_statement(){
+        assertThrows(
+                Exception.class,
+                () -> new Question("does Amazon rainforest spand across nine countries?", Question.QType.OPEN)
+        );
+    }
+
+
 
 }
 

@@ -9,6 +9,8 @@ public class OpenQuestion {
         this.statement = statement;
     }
 
+
+
     private void validateStatementNotEmpty(String statement) {
         if (statement.trim().isEmpty()) {
             throw new IllegalArgumentException("cannot accept empty statement");
