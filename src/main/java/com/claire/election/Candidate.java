@@ -26,4 +26,12 @@ class Candidate {
     int getId() {
         return id;
     }
+
+    private boolean isAlive() {
+        return true;
+    }
+
+    boolean isNotAlive() {
+        return !isAlive();
+    }
 }
