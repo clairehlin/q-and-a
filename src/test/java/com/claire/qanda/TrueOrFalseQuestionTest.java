@@ -10,7 +10,7 @@ class TrueOrFalseQuestionTest {
     void can_create_question_successfully() {
         assertDoesNotThrow(() ->
                 new TrueOrFalseQuestion(
-                        "Is Trump the current president?"
+                        "Trump is the current president."
                 )
         );
     }
@@ -30,6 +30,22 @@ class TrueOrFalseQuestionTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new TrueOrFalseQuestion(" ")
+        );
+    }
+
+    @Test
+    void should_not_accept_question_mark_on_statement(){
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new TrueOrFalseQuestion("There is only one solar system?")
+        );
+    }
+
+    @Test
+    void statement_should_end_with_full_stop(){
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new TrueOrFalseQuestion("There is only one solar system")
         );
     }
 }
