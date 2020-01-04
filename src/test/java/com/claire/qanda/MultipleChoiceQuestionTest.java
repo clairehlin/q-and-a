@@ -20,7 +20,8 @@ class MultipleChoiceQuestionTest {
                                 "John",
                                 "Rooseville",
                                 "Clinton"
-                        )
+                        ),
+                        3
                 )
         );
     }
@@ -35,7 +36,8 @@ class MultipleChoiceQuestionTest {
                                 "John",
                                 "RooseVille",
                                 "Clinton"
-                        )
+                        ),
+                        3
                 )
         );
 
@@ -47,7 +49,8 @@ class MultipleChoiceQuestionTest {
                                 "John",
                                 "RooseVille",
                                 "Clinton"
-                        )
+                        ),
+                        3
                 )
         );
 
@@ -59,7 +62,8 @@ class MultipleChoiceQuestionTest {
                                 "John",
                                 "RooseVille",
                                 "Clinton"
-                        )
+                        ),
+                        3
                 )
         );
     }
@@ -71,27 +75,30 @@ class MultipleChoiceQuestionTest {
                 () -> new MultipleChoiceQuestion("who is the president during world war I?",
                         singletonList(
                                 "John"
-                        )
+                        ),
+                        3
                 )
         );
 
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new MultipleChoiceQuestion("who is the president during world war I?",
-                        emptyList()
+                        emptyList(),
+                        3
                 )
         );
 
         assertThrows(
                 NullPointerException.class,
                 () -> new MultipleChoiceQuestion("who is the president during world war I?",
-                        null
+                        null,
+                        3
                 )
         );
     }
 
     @Test
-    void should_reject_empty_choices(){
+    void should_reject_empty_choices() {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new MultipleChoiceQuestion("who is the president during world war I?",
@@ -100,7 +107,8 @@ class MultipleChoiceQuestionTest {
                                 "",
                                 "RooseVille",
                                 "Clinton"
-                        )
+                        ),
+                        3
                 )
         );
 
@@ -112,7 +120,42 @@ class MultipleChoiceQuestionTest {
                                 null,
                                 "RooseVille",
                                 "Clinton"
-                        )
+                        ),
+                        3
+                )
+        );
+    }
+
+    @Test
+    void reject_negative_number_of_answer() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new MultipleChoiceQuestion(
+                        "Who was the US president during world war I?",
+                        asList(
+                                "Jack",
+                                "John",
+                                "Rooseville",
+                                "Clinton"
+                        ),
+                        -1
+                )
+        );
+    }
+
+    @Test
+    void reject_answer_outside_the_options_index_range() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new MultipleChoiceQuestion(
+                        "Who was the US president during world war I?",
+                        asList(
+                                "Jack",
+                                "John",
+                                "Rooseville",
+                                "Clinton"
+                        ),
+                        4
                 )
         );
     }

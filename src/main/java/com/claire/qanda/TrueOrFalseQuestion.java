@@ -1,27 +1,27 @@
 package com.claire.qanda;
 
 class TrueOrFalseQuestion {
-    private final String statement;
-    private final boolean[] selection;
+    private final String initialPhrase;
+    private final boolean[] choices;
 
-    TrueOrFalseQuestion(String statement) {
-        validateStatement(statement);
+    TrueOrFalseQuestion(String initialPhrase) {
+        validateInitialPhrase(initialPhrase);
 
-        this.statement = statement;
-        selection = new boolean[]{true, false};
+        this.initialPhrase = initialPhrase;
+        choices = new boolean[]{true, false};
     }
 
-    private void validateStatement(String statement) {
-        if (statement.trim().isEmpty()) {
-            throw new IllegalArgumentException("the statement cannot be empty");
+    private void validateInitialPhrase(String initialPhrase) {
+        if (initialPhrase.trim().isEmpty()) {
+            throw new IllegalArgumentException("the initialPhrase cannot be empty");
         }
 
-        if (statement.trim().endsWith("?")) {
-            throw new IllegalArgumentException("the statement must not contain question mark");
+        if (initialPhrase.trim().endsWith("?")) {
+            throw new IllegalArgumentException("the initialPhrase must not contain question mark");
         }
 
-        if (!statement.trim().endsWith(".")) {
-            throw new IllegalArgumentException("the statement must contain full stop mark at the end");
+        if (!initialPhrase.trim().endsWith(".")) {
+            throw new IllegalArgumentException("the initialPhrase must contain full stop mark at the end");
         }
     }
 
