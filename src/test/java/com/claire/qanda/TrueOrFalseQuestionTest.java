@@ -2,7 +2,8 @@ package com.claire.qanda;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TrueOrFalseQuestionTest {
 
@@ -16,7 +17,7 @@ class TrueOrFalseQuestionTest {
     }
 
     @Test
-    void should_not_accept_empty_statement(){
+    void should_not_accept_empty_statement() {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new TrueOrFalseQuestion("", true)
@@ -34,7 +35,7 @@ class TrueOrFalseQuestionTest {
     }
 
     @Test
-    void should_not_accept_question_mark_on_statement(){
+    void should_not_accept_question_mark_on_statement() {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new TrueOrFalseQuestion("There is only one solar system?", true)
@@ -42,7 +43,7 @@ class TrueOrFalseQuestionTest {
     }
 
     @Test
-    void statement_should_end_with_full_stop(){
+    void statement_should_end_with_full_stop() {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new TrueOrFalseQuestion("There is only one solar system", true)
