@@ -1,10 +1,16 @@
 package com.claire.qanda;
 
-class TrueOrFalseQuestion {
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.joining;
+
+class TrueOrFalseQuestion implements Question {
     private final String initialPhrase;
     private final boolean[] choices;
+    private final boolean answer;
 
-    TrueOrFalseQuestion(String initialPhrase) {
+    TrueOrFalseQuestion(String initialPhrase, boolean answer) {
+        this.answer = answer;
         validateInitialPhrase(initialPhrase);
 
         this.initialPhrase = initialPhrase;
@@ -25,4 +31,34 @@ class TrueOrFalseQuestion {
         }
     }
 
+    @Override
+    public String statement() {
+        return initialPhrase + "\n" + choicesAsBullets(choices);
+    }
+
+    private String choicesAsBullets2(boolean[] choices) {
+        String combineChoices = "";
+        int counter = 1;
+        for (boolean choice : choices) {
+            combineChoices = combineChoices + counter + ". " + choice + "\n";
+            counter++;
+        }
+        return combineChoices;
+    }
+
+    private String choicesAsBullets(boolean[] choices) {
+        return IntStream.range(0, choices.length)
+                .mapToObj(i -> prefix(i) + choices[i])
+                .collect(joining("\n"));
+    }
+
+    private String prefix(int i) {
+        return (i + 1) + ". ";
+    }
+
+
+    @Override
+    public String correctAnswer() {
+        return String.valueOf(answer);
+    }
 }

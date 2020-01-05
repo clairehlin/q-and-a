@@ -10,8 +10,8 @@ class TrueOrFalseQuestionTest {
     void can_create_question_successfully() {
         assertDoesNotThrow(() ->
                 new TrueOrFalseQuestion(
-                        "Trump is the current president."
-                )
+                        "Trump is the current president.",
+                        true)
         );
     }
 
@@ -19,17 +19,17 @@ class TrueOrFalseQuestionTest {
     void should_not_accept_empty_statement(){
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new TrueOrFalseQuestion("")
+                () -> new TrueOrFalseQuestion("", true)
         );
 
         assertThrows(
                 NullPointerException.class,
-                () -> new TrueOrFalseQuestion(null)
+                () -> new TrueOrFalseQuestion(null, true)
         );
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new TrueOrFalseQuestion(" ")
+                () -> new TrueOrFalseQuestion(" ", true)
         );
     }
 
@@ -37,7 +37,7 @@ class TrueOrFalseQuestionTest {
     void should_not_accept_question_mark_on_statement(){
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new TrueOrFalseQuestion("There is only one solar system?")
+                () -> new TrueOrFalseQuestion("There is only one solar system?", true)
         );
     }
 
@@ -45,7 +45,7 @@ class TrueOrFalseQuestionTest {
     void statement_should_end_with_full_stop(){
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new TrueOrFalseQuestion("There is only one solar system")
+                () -> new TrueOrFalseQuestion("There is only one solar system", true)
         );
     }
 }
