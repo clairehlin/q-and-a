@@ -4,12 +4,12 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.joining;
 
-class TrueOrFalseQuestion implements Question {
+class SimpleTrueOrFalseQuestion implements Question {
     private final String initialPhrase;
     private final boolean[] choices;
     private final boolean answer;
 
-    TrueOrFalseQuestion(String initialPhrase, boolean answer) {
+    SimpleTrueOrFalseQuestion(String initialPhrase, boolean answer) {
         this.answer = answer;
         validateInitialPhrase(initialPhrase);
 

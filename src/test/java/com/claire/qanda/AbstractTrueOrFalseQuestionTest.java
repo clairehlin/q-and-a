@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class SimpleTrueOrFalseQuestionTest {
+abstract class AbstractTrueOrFalseQuestionTest {
 
     @Test
     void can_create_question_successfully() {
@@ -49,9 +49,5 @@ class SimpleTrueOrFalseQuestionTest {
         );
     }
 
-    private Question trueOrFalseQuestion(String s) {
-//        return new SimpleTrueOrFalseQuestion(s, true);
-//        return new CompositionTrueOrFalseQuestion(s, true);
-        return new InheritanceTrueOrFalseQuestion(s, true);
-    }
+    protected abstract Question trueOrFalseQuestion(String s);
 }

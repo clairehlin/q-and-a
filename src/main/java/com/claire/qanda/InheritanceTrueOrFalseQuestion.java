@@ -2,12 +2,10 @@ package com.claire.qanda;
 
 import static java.util.Arrays.asList;
 
-class CompositionTrueOrFalseQuestion implements Question {
-    private final MultipleChoiceQuestion multipleChoiceQuestion;
+class InheritanceTrueOrFalseQuestion extends MultipleChoiceQuestion {
 
-    CompositionTrueOrFalseQuestion(String initialPhrase, boolean answer) {
-        validateInitialPhrase(initialPhrase);
-        multipleChoiceQuestion = new MultipleChoiceQuestion(
+    InheritanceTrueOrFalseQuestion(String initialPhrase, boolean answer) {
+        super(
                 initialPhrase,
                 asList(
                         String.valueOf(true),
@@ -15,6 +13,7 @@ class CompositionTrueOrFalseQuestion implements Question {
                 ),
                 answer ? 0 : 1
         );
+        validateInitialPhrase(initialPhrase);
     }
 
     private void validateInitialPhrase(String initialPhrase) {
@@ -29,15 +28,5 @@ class CompositionTrueOrFalseQuestion implements Question {
         if (!initialPhrase.trim().endsWith(".")) {
             throw new IllegalArgumentException("the initialPhrase must contain full stop mark at the end");
         }
-    }
-
-    @Override
-    public String statement() {
-        return multipleChoiceQuestion.statement();
-    }
-
-    @Override
-    public String correctAnswer() {
-        return multipleChoiceQuestion.correctAnswer();
     }
 }
