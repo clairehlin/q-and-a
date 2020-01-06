@@ -10,9 +10,7 @@ class TrueOrFalseQuestionTest {
     @Test
     void can_create_question_successfully() {
         assertDoesNotThrow(() ->
-                new TrueOrFalseQuestion(
-                        "Trump is the current president.",
-                        true)
+                trueOrFalseQuestion("Trump is the current president.")
         );
     }
 
@@ -20,17 +18,17 @@ class TrueOrFalseQuestionTest {
     void should_not_accept_empty_statement() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new TrueOrFalseQuestion("", true)
+                () -> trueOrFalseQuestion("")
         );
 
         assertThrows(
                 NullPointerException.class,
-                () -> new TrueOrFalseQuestion(null, true)
+                () -> trueOrFalseQuestion(null)
         );
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new TrueOrFalseQuestion(" ", true)
+                () -> trueOrFalseQuestion(" ")
         );
     }
 
@@ -38,7 +36,7 @@ class TrueOrFalseQuestionTest {
     void should_not_accept_question_mark_on_statement() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new TrueOrFalseQuestion("There is only one solar system?", true)
+                () -> trueOrFalseQuestion("There is only one solar system?")
         );
     }
 
@@ -46,7 +44,17 @@ class TrueOrFalseQuestionTest {
     void statement_should_end_with_full_stop() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new TrueOrFalseQuestion("There is only one solar system", true)
+                () -> trueOrFalseQuestion("There is only one solar system")
         );
+    }
+
+    private TrueOrFalseQuestion trueOrFalseQuestion(String s) {
+        return new TrueOrFalseQuestion(s, true);
+    }
+
+    @Test
+    void how_to_print_array_elements(){
+        int[] a = new int[]{1,2,3};
+        System.out.println(String.valueOf(a[1]));
     }
 }
