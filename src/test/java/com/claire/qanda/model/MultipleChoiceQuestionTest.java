@@ -131,7 +131,7 @@ class MultipleChoiceQuestionTest {
     void reject_negative_number_of_answer() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultipleChoiceQu estion(
+                () -> new MultipleChoiceQuestion(
                         "Who was the US president during world war I?",
                         asList(
                                 "Jack",
