@@ -1,5 +1,6 @@
-package com.claire.qanda;
+package com.claire.qanda.model;
 
+import com.claire.qanda.model.MultipleChoiceQuestion;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
@@ -130,7 +131,7 @@ class MultipleChoiceQuestionTest {
     void reject_negative_number_of_answer() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultipleChoiceQuestion(
+                () -> new MultipleChoiceQu estion(
                         "Who was the US president during world war I?",
                         asList(
                                 "Jack",

@@ -1,4 +1,4 @@
-package com.claire.qanda;
+package com.claire.qanda.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,12 +7,12 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.joining;
 
-class MultipleChoiceQuestion implements Question {
+public class MultipleChoiceQuestion implements Question {
     private final String initialPhrase;
     private final List<String> choices = new ArrayList<>();
     private final int answer;
 
-    MultipleChoiceQuestion(String initialPhrase, List<String> choices, int answer) {
+    public MultipleChoiceQuestion(String initialPhrase, List<String> choices, int answer) {
         validateInitialPhrase(initialPhrase);
         this.initialPhrase = initialPhrase;
 

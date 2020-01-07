@@ -1,5 +1,6 @@
-package com.claire.qanda;
+package com.claire.qanda.model;
 
+import com.claire.qanda.model.Question;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

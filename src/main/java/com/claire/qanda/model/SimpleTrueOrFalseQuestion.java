@@ -1,4 +1,4 @@
-package com.claire.qanda;
+package com.claire.qanda.model;
 
 import java.util.stream.IntStream;
 
