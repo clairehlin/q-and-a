@@ -6,7 +6,6 @@ class Candidate {
     private final Runnable leaderAction;
     private final Runnable nonLeaderAction;
 
-
     Candidate(Election election, int id, Runnable leaderAction, Runnable nonLeaderAction) {
         this.election = election;
         this.id = id;

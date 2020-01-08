@@ -1,6 +1,5 @@
 package com.claire.qanda.model;
 
-import com.claire.qanda.model.MultipleChoiceQuestion;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
