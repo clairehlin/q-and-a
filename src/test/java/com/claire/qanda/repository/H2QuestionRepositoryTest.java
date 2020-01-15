@@ -1,5 +1,6 @@
 package com.claire.qanda.repository;
 
+import com.claire.qanda.model.Question;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,19 +14,26 @@ import java.sql.Statement;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class H2QuestionRepositoryTest {
 
     @BeforeEach
     void create_schema() throws IOException {
         applyDatabaseUpdatesFromFile("/db-schema/schema.sql");
-        applyDatabaseUpdatesFromFile("questions.sql");
+        applyDatabaseUpdatesFromFile("/questions.sql");
     }
 
     @Test
-    void can_connect_to_db() {
+    void can_list_questions_from_database() {
+        // given
         H2QuestionRepository h2QuestionRepository = new H2QuestionRepository();
-        h2QuestionRepository.list();
+
+        // when
+        final List<Question> questions = h2QuestionRepository.list();
+
+        // then
+        assertEquals(questions.size(), 2);
     }
 
     void applyDatabaseUpdatesFromFile(String filepath) throws IOException {
@@ -37,7 +45,7 @@ class H2QuestionRepositoryTest {
     }
 
     void applyUpdatesToDatabase(List<String> schemaStatements) {
-        String url = "jdbc:h2:mem:";
+        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
 
         try (
                 Connection con = DriverManager.getConnection(url);
@@ -46,6 +54,7 @@ class H2QuestionRepositoryTest {
             for (String statement : schemaStatements) {
                 stm.executeUpdate(statement);
             }
+            con.commit();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
