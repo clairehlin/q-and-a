@@ -33,7 +33,7 @@ class H2QuestionRepositoryTest {
         final List<Question> questions = h2QuestionRepository.list();
 
         // then
-        assertEquals(questions.size(), 2);
+        assertEquals(questions.size(), 4);
     }
 
     void applyDatabaseUpdatesFromFile(String filepath) throws IOException {

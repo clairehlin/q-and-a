@@ -19,5 +19,6 @@ create table choice (
    id int not null primary key,
    multiple_choice_question_id int not null,
    choice varchar(250) not null,
+   is_correct_answer boolean not null,
    foreign key (multiple_choice_question_id) references multiple_choice_question(id)
 );
