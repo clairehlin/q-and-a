@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
 
 public class MultipleChoiceQuestion implements Question {
@@ -107,5 +108,13 @@ public class MultipleChoiceQuestion implements Question {
 
     public String correctAnswer() {
         return choices.get(answer);
+    }
+
+    public String getInitialPhrase() {
+        return initialPhrase;
+    }
+
+    public List<String> getChoices() {
+        return unmodifiableList(choices);
     }
 }

@@ -14,7 +14,99 @@ public class H2QuestionRepository implements QuestionRepository {
 
     @Override
     public Question save(Question question) {
-        return null;
+        if (question.getClass() == OpenQuestion.class) {
+            saveOpenQuestion((OpenQuestion) question);
+        } else if (question.getClass() == SimpleTrueOrFalseQuestion.class) {
+            saveSimpleTrueOrFalseQuestion((SimpleTrueOrFalseQuestion) question);
+        } else if (question.getClass() == MultipleChoiceQuestion.class) {
+            saveMultipleChoiceQuestion((MultipleChoiceQuestion) question);
+        } else {
+            throw new IllegalArgumentException("cannot save question of type " + question.getClass().getName());
+        }
+        return question;
+    }
+
+    private void saveMultipleChoiceQuestion(MultipleChoiceQuestion question) {
+        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
+        String sql = "insert into multiple_choice_question (initial_phrase) values (?)";
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                PreparedStatement stm = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        ) {
+            //setString(parameterIndex: 1, ....) means replace the above one (?) with the value in
+            // the second parameter which is question.getInitialPhrase()
+            stm.setString(1, question.getInitialPhrase());
+            stm.executeUpdate();
+            final ResultSet generatedKeys = stm.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                final int qId = generatedKeys.getInt(1);
+                saveChoices(con, qId, question.getChoices(), question.correctAnswer());
+            } else {
+                throw new IllegalStateException("could not save question initial phrase: " + question);
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void saveChoices(Connection con, int qId, List<String> choices, String correctAnswer) {
+        for (String choice: choices) {
+            saveChoice(con, qId, choice, choice.equals(correctAnswer));
+        }
+    }
+
+    private void saveChoice(Connection con, int qId, String choice, boolean correctAnswer) {
+        String sql = String.format(
+                "insert into choice (multiple_choice_question_id, choice, is_correct_answer) values (%s, '%s', %s)",
+                qId,
+                choice,
+                correctAnswer
+        );
+
+        try (
+                Statement stm = con.createStatement()
+        ) {
+            stm.executeUpdate(sql);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void saveSimpleTrueOrFalseQuestion(SimpleTrueOrFalseQuestion question) {
+        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
+        String sql = String.format(
+                "insert into true_false_question (initial_phrase, answer) values ('%s', %s)",
+                question.getInitialPhrase(),
+                question.correctAnswer()
+        );
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                Statement stm = con.createStatement()
+        ) {
+            stm.executeUpdate(sql);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void saveOpenQuestion(OpenQuestion question) {
+        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
+        String sql = String.format(
+                "insert into open_question (statement, answer) values ('%s', '%s')",
+                question.statement(),
+                question.correctAnswer()
+        );
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                Statement stm = con.createStatement()
+        ) {
+            stm.executeUpdate(sql);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override

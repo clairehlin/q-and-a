@@ -36,6 +36,10 @@ public class SimpleTrueOrFalseQuestion implements Question {
         return initialPhrase + "\n" + choicesAsBullets(choices);
     }
 
+    public String getInitialPhrase() {
+        return initialPhrase;
+    }
+
     private String choicesAsBullets2(boolean[] choices) {
         String combineChoices = "";
         int counter = 1;
