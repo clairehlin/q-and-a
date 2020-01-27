@@ -1,28 +1,46 @@
 package com.claire.qanda;
 
 import com.claire.qanda.web.QuestionResource;
-import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.startup.Tomcat;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.servlet.ServletContainer;
 
-import java.io.File;
+import static java.util.stream.Collectors.joining;
 
 public class QuestionsApplication {
-    public static void main(String... args) throws LifecycleException {
-        Tomcat tomcat = new Tomcat();
-        tomcat.setPort(8080);
+    public static void main(String... args) throws Exception {
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
 
-        Context context = tomcat.addWebapp("", new File(".").getAbsolutePath());
-        Tomcat.addServlet(context, "jersey-container-servlet", resources());
-        context.addServletMappingDecoded("/*", "jersey-container-servlet");
+        Server jettyServer = new Server(8080);
+        jettyServer.setHandler(context);
 
-        tomcat.start();
-        tomcat.getServer().await();
+        ServletHolder jerseyServlet = context.addServlet(
+                org.glassfish.jersey.servlet.ServletContainer.class, "/*");
+        jerseyServlet.setInitOrder(0);
+
+        // Tells the Jersey Servlet which REST service/class to load.
+        jerseyServlet.setInitParameter(
+                "jersey.config.server.provider.classnames",
+                classNames()
+        );
+
+        try {
+            jettyServer.start();
+            jettyServer.join();
+        } finally {
+            jettyServer.destroy();
+        }
     }
 
-    private static ServletContainer resources() {
-        return new ServletContainer(new ResourceConfig(QuestionResource.class));
+    private static String classNames() {
+        return new ResourceConfig(QuestionResource.class)
+                .getClasses()
+                .stream()
+                .map(Class::getCanonicalName)
+                .collect(
+                        joining(",")
+                );
     }
 }

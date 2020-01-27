@@ -22,6 +22,7 @@ public class SimpleQuestionsService implements QuestionsService {
         db.save(question);
     }
 
+    @Override
     public List<Question> list() {
         return unmodifiableList(db.list());
     }
