@@ -3,7 +3,6 @@ package com.claire.qanda.web;
 import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
 import com.claire.qanda.services.QuestionsService;
-import com.claire.qanda.services.SimpleQuestionsService;
 import com.claire.qanda.web.model.WebOpenQuestion;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -19,12 +18,14 @@ import java.util.List;
 @Singleton
 public class QuestionResource {
 
-    private final QuestionsService questionsService = new SimpleQuestionsService();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final QuestionsService questionsService;
+    private final ObjectMapper objectMapper;
 
-    public QuestionResource() {
-        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+    public QuestionResource(QuestionsService questionsService, ObjectMapper objectMapper) {
+        this.questionsService = questionsService;
+        this.objectMapper = objectMapper;
+        this.objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        this.objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
     @GET

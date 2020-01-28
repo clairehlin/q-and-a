@@ -2,19 +2,19 @@ package com.claire.qanda.services;
 
 import com.claire.qanda.model.Question;
 import com.claire.qanda.repository.QuestionRepository;
-import com.claire.qanda.repository.SimpleQuestionRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.*;
 
 public class SimpleQuestionsService implements QuestionsService {
 
-//    private final List<Question> db = new ArrayList<>();
-    private final QuestionRepository db = new SimpleQuestionRepository();
+    private final QuestionRepository db;
+
+    public SimpleQuestionsService(QuestionRepository db) {
+        this.db = db;
+    }
 
     @Override
     public void addQuestion(Question question) {
