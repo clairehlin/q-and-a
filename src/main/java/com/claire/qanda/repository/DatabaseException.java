@@ -1,4 +1,7 @@
 package com.claire.qanda.repository;
 
-public class DatabaseException {
+class DatabaseException extends RuntimeException {
+    DatabaseException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

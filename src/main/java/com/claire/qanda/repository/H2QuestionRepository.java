@@ -5,12 +5,26 @@ import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
 import com.claire.qanda.model.SimpleTrueOrFalseQuestion;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.claire.qanda.repository.Database.applyDatabaseUpdatesFromFile;
+
 public class H2QuestionRepository implements QuestionRepository {
+
+    private final String url;
+
+    public H2QuestionRepository(String dbUrl) throws DatabaseException {
+        this.url = dbUrl;
+        try {
+            applyDatabaseUpdatesFromFile(dbUrl, "db-schema/schema.sql");
+        } catch (IOException e) {
+            throw new DatabaseException("Failed to create schema", e);
+        }
+    }
 
     @Override
     public Question save(Question question) {
@@ -27,7 +41,6 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     private void saveMultipleChoiceQuestion(MultipleChoiceQuestion question) {
-        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
         String sql = "insert into multiple_choice_question (initial_phrase) values (?)";
 
         try (
@@ -74,7 +87,6 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     private void saveSimpleTrueOrFalseQuestion(SimpleTrueOrFalseQuestion question) {
-        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
         String sql = String.format(
                 "insert into true_false_question (initial_phrase, answer) values ('%s', %s)",
                 question.getInitialPhrase(),
@@ -92,7 +104,6 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     private void saveOpenQuestion(OpenQuestion question) {
-        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
         String sql = String.format(
                 "insert into open_question (statement, answer) values ('%s', '%s')",
                 question.statement(),
@@ -122,7 +133,6 @@ public class H2QuestionRepository implements QuestionRepository {
         String tableName = "multiple_choice_question";
         List<Question> questions = new ArrayList<>();
 
-        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
         String sql = "select * from " + tableName;
         try (
                 Connection con = DriverManager.getConnection(url);
@@ -153,7 +163,6 @@ public class H2QuestionRepository implements QuestionRepository {
         String tableName = "choice";
         int correctAnswerIndex = 0;
 
-        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
         String sql = "select * from " + tableName + " where multiple_choice_question_id = " + id;
         try (
                 Connection con = DriverManager.getConnection(url);
@@ -178,7 +187,6 @@ public class H2QuestionRepository implements QuestionRepository {
         String tableName = "choice";
         List<String> choices = new ArrayList<>();
 
-        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
         String sql = "select * from " + tableName + " where multiple_choice_question_id = " + id;
         try (
                 Connection con = DriverManager.getConnection(url);
@@ -200,7 +208,6 @@ public class H2QuestionRepository implements QuestionRepository {
         String tableName = "true_false_question";
         List<Question> questions = new ArrayList<>();
 
-        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
         String sql = "select * from " + tableName;
         try (
                 Connection con = DriverManager.getConnection(url);
@@ -230,7 +237,6 @@ public class H2QuestionRepository implements QuestionRepository {
         String openQuestionsTable = "open_question";
         List<Question> openQuestions = new ArrayList<>();
 
-        String url = "jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1";
         String sql = "select * from " + openQuestionsTable;
         try (
                 Connection con = DriverManager.getConnection(url);

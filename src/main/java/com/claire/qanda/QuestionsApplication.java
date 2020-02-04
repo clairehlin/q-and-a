@@ -1,6 +1,7 @@
 package com.claire.qanda;
 
-import com.claire.qanda.repository.SimpleQuestionRepository;
+import com.claire.qanda.common.IO;
+import com.claire.qanda.repository.H2QuestionRepository;
 import com.claire.qanda.services.SimpleQuestionsService;
 import com.claire.qanda.web.QuestionResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +11,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-import static java.util.stream.Collectors.joining;
+import java.util.Properties;
 
 public class QuestionsApplication {
     public static void main(String... args) throws Exception {
@@ -44,9 +45,10 @@ public class QuestionsApplication {
     }
 
     private static QuestionResource questionResource() {
+        final Properties dbConfig = IO.getPropertiesFromResource("config/db.properties");
         return new QuestionResource(
                 new SimpleQuestionsService(
-                        new SimpleQuestionRepository()
+                        new H2QuestionRepository(dbConfig.getProperty("db.url"))
                 ),
                 new ObjectMapper()
         );
