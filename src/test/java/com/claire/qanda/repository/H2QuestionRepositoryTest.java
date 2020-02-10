@@ -1,10 +1,7 @@
 package com.claire.qanda.repository;
 
 import com.claire.qanda.common.IO;
-import com.claire.qanda.model.MultipleChoiceQuestion;
-import com.claire.qanda.model.OpenQuestion;
-import com.claire.qanda.model.Question;
-import com.claire.qanda.model.SimpleTrueOrFalseQuestion;
+import com.claire.qanda.model.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +11,7 @@ import java.util.Properties;
 
 import static com.claire.qanda.repository.Database.applyDatabaseUpdatesFromFile;
 import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class H2QuestionRepositoryTest {
     private static String dbUrl;
@@ -46,8 +42,8 @@ class H2QuestionRepositoryTest {
         applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
 
         //when
-        OpenQuestion question = new OpenQuestion("what day is today?", "Saturday");
-        Question questions = h2QuestionRepository.save(question);
+        OpenQuestion question = new OpenQuestion(null, "what day is today?", "Saturday");
+        IdentifiableQuestion savedQuestion = h2QuestionRepository.save(question);
 
         //then
         assertEquals(h2QuestionRepository.list().size(), 5);
@@ -55,6 +51,7 @@ class H2QuestionRepositoryTest {
                 .stream()
                 .anyMatch(q -> q.statement().equals("what day is today?"));
         assertTrue(savedQuestionFound);
+        assertNotNull(savedQuestion.id());
     }
 
     @Test
@@ -68,7 +65,7 @@ class H2QuestionRepositoryTest {
                 "you are ok.",
                 true
         );
-        Question questions = h2QuestionRepository.save(simpleTrueOrFalseQuestion);
+        IdentifiableQuestion questions = h2QuestionRepository.save(simpleTrueOrFalseQuestion);
 
         //then
         assertEquals(h2QuestionRepository.list().size(), 5);

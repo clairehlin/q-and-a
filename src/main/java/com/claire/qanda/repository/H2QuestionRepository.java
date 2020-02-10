@@ -1,9 +1,6 @@
 package com.claire.qanda.repository;
 
-import com.claire.qanda.model.MultipleChoiceQuestion;
-import com.claire.qanda.model.OpenQuestion;
-import com.claire.qanda.model.Question;
-import com.claire.qanda.model.SimpleTrueOrFalseQuestion;
+import com.claire.qanda.model.*;
 
 import java.io.IOException;
 import java.sql.*;
@@ -27,9 +24,9 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     @Override
-    public Question save(Question question) {
+    public IdentifiableQuestion save(Question question) {
         if (question.getClass() == OpenQuestion.class) {
-            saveOpenQuestion((OpenQuestion) question);
+            return saveOpenQuestion((OpenQuestion) question);
         } else if (question.getClass() == SimpleTrueOrFalseQuestion.class) {
             saveSimpleTrueOrFalseQuestion((SimpleTrueOrFalseQuestion) question);
         } else if (question.getClass() == MultipleChoiceQuestion.class) {
@@ -37,7 +34,7 @@ public class H2QuestionRepository implements QuestionRepository {
         } else {
             throw new IllegalArgumentException("cannot save question of type " + question.getClass().getName());
         }
-        return question;
+        return new QuestionToIdentifiableQuestionAdapter(question);
     }
 
     private void saveMultipleChoiceQuestion(MultipleChoiceQuestion question) {
@@ -64,7 +61,7 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     private void saveChoices(Connection con, int qId, List<String> choices, String correctAnswer) {
-        for (String choice: choices) {
+        for (String choice : choices) {
             saveChoice(con, qId, choice, choice.equals(correctAnswer));
         }
     }
@@ -103,21 +100,30 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
-    private void saveOpenQuestion(OpenQuestion question) {
-        String sql = String.format(
-                "insert into open_question (statement, answer) values ('%s', '%s')",
-                question.statement(),
-                question.correctAnswer()
-        );
+    private OpenQuestion saveOpenQuestion(OpenQuestion question) {
+        String sql = "insert into open_question (statement, answer) values (?, ?)";
 
         try (
                 Connection con = DriverManager.getConnection(url);
-                Statement stm = con.createStatement()
+                PreparedStatement stm = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
-            stm.executeUpdate(sql);
+            //setString(parameterIndex: 1, ....) means replace the above one (?) with the value in
+            // the second parameter which is question.statement()
+            stm.setString(1, question.statement());
+            stm.setString(2, question.correctAnswer());
+            stm.executeUpdate();
+            final ResultSet generatedKeys = stm.getGeneratedKeys();
+
+            if (generatedKeys.next()) {
+                final int qId = generatedKeys.getInt(1);
+                return question.withId(qId);
+            } else {
+                throw new IllegalStateException("could not find generated keys");
+            }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
+
     }
 
     @Override
@@ -241,6 +247,7 @@ public class H2QuestionRepository implements QuestionRepository {
         try (
                 Connection con = DriverManager.getConnection(url);
                 Statement stm = con.createStatement();
+
                 ResultSet resultSet = stm.executeQuery(sql)
         ) {
 
@@ -248,7 +255,7 @@ public class H2QuestionRepository implements QuestionRepository {
                 int id = resultSet.getInt(1);
                 String statement = resultSet.getString(2);
                 String answer = resultSet.getString(3);
-                OpenQuestion openQuestion = new OpenQuestion(statement, answer);
+                OpenQuestion openQuestion = new OpenQuestion(id, statement, answer);
                 openQuestions.add(openQuestion);
 
             }

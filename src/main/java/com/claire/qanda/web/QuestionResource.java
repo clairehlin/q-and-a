@@ -39,7 +39,7 @@ public class QuestionResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public void addQuestions(WebOpenQuestion webOpenQuestion) {
         questionsService.addQuestion(
-                new OpenQuestion(webOpenQuestion.statement, webOpenQuestion.answer)
+                new OpenQuestion(null, webOpenQuestion.statement, webOpenQuestion.answer)
         );
     }
 

@@ -14,7 +14,7 @@ class SimpleQuestionsServiceTest {
     @Test
     void can_add_questions() {
         SimpleQuestionsService simpleQuestionService = new SimpleQuestionsService(new SimpleQuestionRepository());
-        simpleQuestionService.addQuestion(new OpenQuestion("a", "b"));
+        simpleQuestionService.addQuestion(new OpenQuestion(null, "a", "b"));
         List<Question> questions = simpleQuestionService.list();
         assertEquals(1, questions.size());
     }

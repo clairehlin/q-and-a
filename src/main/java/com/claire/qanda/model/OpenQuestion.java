@@ -1,13 +1,15 @@
 package com.claire.qanda.model;
 
-public class OpenQuestion implements Question {
+public class OpenQuestion implements IdentifiableQuestion {
     private final String statement;
     private final String answer;
+    private final Integer id;
 
-    public OpenQuestion(String statement, String answer) {
+    public OpenQuestion(Integer id, String statement, String answer) {
         validateStatementNotEmpty(statement);
         validateAnswerNotEmpty(answer);
 
+        this.id = id;
         this.statement = statement;
         this.answer = answer;
     }
@@ -32,5 +34,14 @@ public class OpenQuestion implements Question {
     @Override
     public String correctAnswer() {
         return answer;
+    }
+
+    @Override
+    public Integer id() {
+        return id;
+    }
+
+    public OpenQuestion withId(Integer id){
+        return new OpenQuestion(id, this.statement, this.answer);
     }
 }
