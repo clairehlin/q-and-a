@@ -84,24 +84,49 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     private void saveSimpleTrueOrFalseQuestion(SimpleTrueOrFalseQuestion question) {
-        String sql = String.format(
-                "insert into true_false_question (initial_phrase, answer) values ('%s', %s)",
-                question.getInitialPhrase(),
-                question.correctAnswer()
-        );
+//        String sql = String.format(
+//                "insert into true_false_question (initial_phrase, answer) values ('%s', %s)",
+//                question.getInitialPhrase(),
+//                question.correctAnswer()
+//        );
+        String sql = "insert into true_false_question (initial_phrase, answer) values (?, ?)";
 
         try (
                 Connection con = DriverManager.getConnection(url);
-                Statement stm = con.createStatement()
+                PreparedStatement stm = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
-            stm.executeUpdate(sql);
+            //setString(parameterIndex: 1, ....) means replace the above one (?) with the value in
+            // the second parameter which is question.statement()
+            stm.setString(1, question.getInitialPhrase());
+            stm.setString(2, question.correctAnswer());
+            stm.executeUpdate();
+            final ResultSet generatedKeys = stm.getGeneratedKeys();
+
+            if (generatedKeys.next()) {
+                final int qId = generatedKeys.getInt(1);
+                System.out.println("generated id is " + qId);
+//                return question.withId(qId);
+            } else {
+                throw new IllegalStateException("could not find generated keys");
+            }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
+
+//        try (
+//                Connection con = DriverManager.getConnection(url);
+//                Statement stm = con.createStatement()
+//        ) {
+//            stm.executeUpdate(sql);
+//        } catch (SQLException ex) {
+//            throw new RuntimeException(ex);
+//        }
+
     }
 
     private OpenQuestion saveOpenQuestion(OpenQuestion question) {
         String sql = "insert into open_question (statement, answer) values (?, ?)";
+
 
         try (
                 Connection con = DriverManager.getConnection(url);
@@ -123,7 +148,6 @@ public class H2QuestionRepository implements QuestionRepository {
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
-
     }
 
     @Override
