@@ -8,8 +8,11 @@ public class SimpleTrueOrFalseQuestion implements Question {
     private final String initialPhrase;
     private final boolean[] choices;
     private final boolean answer;
+    private final Integer id;
 
-    public SimpleTrueOrFalseQuestion(String initialPhrase, boolean answer) {
+    public SimpleTrueOrFalseQuestion(Integer id, String initialPhrase, boolean answer) {
+        this.id = id;
+
         this.answer = answer;
         validateInitialPhrase(initialPhrase);
 
@@ -64,5 +67,9 @@ public class SimpleTrueOrFalseQuestion implements Question {
     @Override
     public String correctAnswer() {
         return String.valueOf(answer);
+    }
+
+    public SimpleTrueOrFalseQuestion withId(Integer id) {
+        return new SimpleTrueOrFalseQuestion(id, this.initialPhrase, this.answer);
     }
 }

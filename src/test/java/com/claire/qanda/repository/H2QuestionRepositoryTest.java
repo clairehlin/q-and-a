@@ -62,7 +62,7 @@ class H2QuestionRepositoryTest {
 
         //when
         SimpleTrueOrFalseQuestion simpleTrueOrFalseQuestion = new SimpleTrueOrFalseQuestion(
-                "you are ok.",
+                null, "you are ok.",
                 true
         );
         IdentifiableQuestion questions = h2QuestionRepository.save(simpleTrueOrFalseQuestion);

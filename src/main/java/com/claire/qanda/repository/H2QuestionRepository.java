@@ -83,12 +83,7 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
-    private void saveSimpleTrueOrFalseQuestion(SimpleTrueOrFalseQuestion question) {
-//        String sql = String.format(
-//                "insert into true_false_question (initial_phrase, answer) values ('%s', %s)",
-//                question.getInitialPhrase(),
-//                question.correctAnswer()
-//        );
+    private SimpleTrueOrFalseQuestion saveSimpleTrueOrFalseQuestion(SimpleTrueOrFalseQuestion question) {
         String sql = "insert into true_false_question (initial_phrase, answer) values (?, ?)";
 
         try (
@@ -105,28 +100,17 @@ public class H2QuestionRepository implements QuestionRepository {
             if (generatedKeys.next()) {
                 final int qId = generatedKeys.getInt(1);
                 System.out.println("generated id is " + qId);
-//                return question.withId(qId);
+                return question.withId(qId);
             } else {
                 throw new IllegalStateException("could not find generated keys");
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
-
-//        try (
-//                Connection con = DriverManager.getConnection(url);
-//                Statement stm = con.createStatement()
-//        ) {
-//            stm.executeUpdate(sql);
-//        } catch (SQLException ex) {
-//            throw new RuntimeException(ex);
-//        }
-
     }
 
     private OpenQuestion saveOpenQuestion(OpenQuestion question) {
         String sql = "insert into open_question (statement, answer) values (?, ?)";
-
 
         try (
                 Connection con = DriverManager.getConnection(url);
@@ -250,7 +234,7 @@ public class H2QuestionRepository implements QuestionRepository {
                 String initialPhrase = resultSet.getString(2);
                 boolean answer = resultSet.getBoolean(3);
                 SimpleTrueOrFalseQuestion question = new SimpleTrueOrFalseQuestion(
-                        initialPhrase,
+                        id, initialPhrase,
                         answer
                 );
                 questions.add(question);
