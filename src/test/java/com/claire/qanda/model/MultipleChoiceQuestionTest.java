@@ -14,7 +14,7 @@ class MultipleChoiceQuestionTest {
     void can_create_question_successfully() {
         assertDoesNotThrow(() ->
                 new MultipleChoiceQuestion(
-                        "Who was the US president during world war I?",
+                         "Who was the US president during world war I?",
                         asList(
                                 "Jack",
                                 "John",
@@ -30,7 +30,7 @@ class MultipleChoiceQuestionTest {
     void should_not_accept_empty_statement() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultipleChoiceQuestion("",
+                () -> new MultipleChoiceQuestion( "",
                         asList(
                                 "John",
                                 "John",
@@ -43,7 +43,7 @@ class MultipleChoiceQuestionTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultipleChoiceQuestion(" ",
+                () -> new MultipleChoiceQuestion( " ",
                         asList(
                                 "John",
                                 "John",
@@ -56,7 +56,7 @@ class MultipleChoiceQuestionTest {
 
         assertThrows(
                 NullPointerException.class,
-                () -> new MultipleChoiceQuestion(null,
+                () -> new MultipleChoiceQuestion( null,
                         asList(
                                 "John",
                                 "John",
@@ -72,7 +72,7 @@ class MultipleChoiceQuestionTest {
     void should_not_accept_less_than_two_choices() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultipleChoiceQuestion("who is the president during world war I?",
+                () -> new MultipleChoiceQuestion( "who is the president during world war I?",
                         singletonList(
                                 "John"
                         ),
@@ -82,7 +82,7 @@ class MultipleChoiceQuestionTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultipleChoiceQuestion("who is the president during world war I?",
+                () -> new MultipleChoiceQuestion( "who is the president during world war I?",
                         emptyList(),
                         3
                 )
@@ -90,7 +90,7 @@ class MultipleChoiceQuestionTest {
 
         assertThrows(
                 NullPointerException.class,
-                () -> new MultipleChoiceQuestion("who is the president during world war I?",
+                () -> new MultipleChoiceQuestion( "who is the president during world war I?",
                         null,
                         3
                 )
@@ -101,7 +101,7 @@ class MultipleChoiceQuestionTest {
     void should_reject_empty_choices() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultipleChoiceQuestion("who is the president during world war I?",
+                () -> new MultipleChoiceQuestion( "who is the president during world war I?",
                         asList(
                                 "John",
                                 "",
@@ -114,7 +114,7 @@ class MultipleChoiceQuestionTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MultipleChoiceQuestion("who is the president during world war I?",
+                () -> new MultipleChoiceQuestion( "who is the president during world war I?",
                         asList(
                                 "John",
                                 null,
@@ -131,7 +131,7 @@ class MultipleChoiceQuestionTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new MultipleChoiceQuestion(
-                        "Who was the US president during world war I?",
+                         "Who was the US president during world war I?",
                         asList(
                                 "Jack",
                                 "John",
@@ -148,7 +148,7 @@ class MultipleChoiceQuestionTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new MultipleChoiceQuestion(
-                        "Who was the US president during world war I?",
+                         "Who was the US president during world war I?",
                         asList(
                                 "Jack",
                                 "John",

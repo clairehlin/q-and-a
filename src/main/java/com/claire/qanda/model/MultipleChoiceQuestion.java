@@ -8,12 +8,15 @@ import java.util.stream.IntStream;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
 
-public class MultipleChoiceQuestion implements Question {
+public class MultipleChoiceQuestion implements IdentifiableQuestion {
     private final String initialPhrase;
     private final List<String> choices = new ArrayList<>();
     private final int answer;
+    private final Integer id;
 
-    public MultipleChoiceQuestion(String initialPhrase, List<String> choices, int answer) {
+    public MultipleChoiceQuestion(Integer id, String initialPhrase, List<String> choices, int answer) {
+        this.id = id;
+
         validateInitialPhrase(initialPhrase);
         this.initialPhrase = initialPhrase;
 
@@ -22,6 +25,10 @@ public class MultipleChoiceQuestion implements Question {
 
         validateAnswer(answer);
         this.answer = answer;
+    }
+
+    public MultipleChoiceQuestion(String initialPhrase, List<String> choices, int answer) {
+        this(null, initialPhrase, choices, answer);
     }
 
     private void validateAnswer(int answer) {
@@ -116,5 +123,14 @@ public class MultipleChoiceQuestion implements Question {
 
     public List<String> getChoices() {
         return unmodifiableList(choices);
+    }
+
+    public MultipleChoiceQuestion withId(Integer id) {
+        return new MultipleChoiceQuestion(id, this.initialPhrase, this.choices, this.answer);
+    }
+
+    @Override
+    public Integer id() {
+        return this.id;
     }
 }

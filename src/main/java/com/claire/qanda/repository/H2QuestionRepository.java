@@ -37,7 +37,7 @@ public class H2QuestionRepository implements QuestionRepository {
         return new QuestionToIdentifiableQuestionAdapter(question);
     }
 
-    private void saveMultipleChoiceQuestion(MultipleChoiceQuestion question) {
+    private MultipleChoiceQuestion saveMultipleChoiceQuestion(MultipleChoiceQuestion question) {
         String sql = "insert into multiple_choice_question (initial_phrase) values (?)";
 
         try (
@@ -52,6 +52,7 @@ public class H2QuestionRepository implements QuestionRepository {
             if (generatedKeys.next()) {
                 final int qId = generatedKeys.getInt(1);
                 saveChoices(con, qId, question.getChoices(), question.correctAnswer());
+                return question.withId(qId);
             } else {
                 throw new IllegalStateException("could not save question initial phrase: " + question);
             }
@@ -93,13 +94,12 @@ public class H2QuestionRepository implements QuestionRepository {
             //setString(parameterIndex: 1, ....) means replace the above one (?) with the value in
             // the second parameter which is question.statement()
             stm.setString(1, question.getInitialPhrase());
-            stm.setString(2, question.correctAnswer());
+            stm.setBoolean(2, Boolean.parseBoolean(question.correctAnswer()));
             stm.executeUpdate();
             final ResultSet generatedKeys = stm.getGeneratedKeys();
 
             if (generatedKeys.next()) {
                 final int qId = generatedKeys.getInt(1);
-                System.out.println("generated id is " + qId);
                 return question.withId(qId);
             } else {
                 throw new IllegalStateException("could not find generated keys");
@@ -160,7 +160,7 @@ public class H2QuestionRepository implements QuestionRepository {
                 List<String> choices = getChoices(id);
                 int answer = getAnswer(id);
                 MultipleChoiceQuestion question = new MultipleChoiceQuestion(
-                        initialPhrase,
+                        id, initialPhrase,
                         choices,
                         answer
                 );

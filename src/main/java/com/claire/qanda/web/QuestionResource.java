@@ -42,5 +42,4 @@ public class QuestionResource {
                 new OpenQuestion(null, webOpenQuestion.statement, webOpenQuestion.answer)
         );
     }
-
 }

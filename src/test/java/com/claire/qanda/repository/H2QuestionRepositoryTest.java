@@ -17,7 +17,7 @@ class H2QuestionRepositoryTest {
     private static String dbUrl;
 
     @BeforeAll
-    static void loadProperties(){
+    static void loadProperties() {
         final Properties dbConfig = IO.getPropertiesFromResource("config/db.properties");
         dbUrl = dbConfig.getProperty("db.url");
     }
