@@ -1,9 +1,11 @@
 package com.claire.qanda.repository;
 
+import com.claire.qanda.model.IdentifiableQuestion;
 import com.claire.qanda.model.Question;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -16,10 +18,10 @@ where can we call a method in java or a constructor?
  */
 public class SimpleQuestionRepository implements QuestionRepository {
 
-    private final List<Question> db = new ArrayList<>();
+    private final List<IdentifiableQuestion> db = new ArrayList<>();
 
     @Override
-    public Question save(Question question) {
+    public IdentifiableQuestion save(IdentifiableQuestion question) {
         db.add(question);
         return question;
     }
@@ -27,5 +29,22 @@ public class SimpleQuestionRepository implements QuestionRepository {
     @Override
     public List<Question> list() {
         return unmodifiableList(db);
+    }
+
+    @Override
+    public IdentifiableQuestion getOpenQuestion(Integer id) {
+        return db.stream()
+                .filter(question -> question.id().equals(id))
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    public IdentifiableQuestion getOpenQuestion2(Integer id) {
+        for (IdentifiableQuestion question : db){
+            if (question.id().equals(id)){
+                return question;
+            }
+        }
+        throw new NoSuchElementException("cannot find question with id " + id);
     }
 }

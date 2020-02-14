@@ -42,4 +42,12 @@ public class QuestionResource {
                 new OpenQuestion(null, webOpenQuestion.statement, webOpenQuestion.answer)
         );
     }
+
+    @GET
+    @Path("{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getQuestions(@PathParam("id") Integer id) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(questionsService.get(id));
+
+    }
 }

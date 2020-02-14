@@ -4,7 +4,7 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.joining;
 
-public class SimpleTrueOrFalseQuestion implements Question {
+public class SimpleTrueOrFalseQuestion implements IdentifiableQuestion {
     private final String initialPhrase;
     private final boolean[] choices;
     private final boolean answer;
@@ -44,13 +44,13 @@ public class SimpleTrueOrFalseQuestion implements Question {
     }
 
     private String choicesAsBullets2(boolean[] choices) {
-        String combineChoices = "";
+        StringBuilder combineChoices = new StringBuilder();
         int counter = 1;
         for (boolean choice : choices) {
-            combineChoices = combineChoices + counter + ". " + choice + "\n";
+            combineChoices.append(counter).append(". ").append(choice).append("\n");
             counter++;
         }
-        return combineChoices;
+        return combineChoices.toString();
     }
 
     private String choicesAsBullets(boolean[] choices) {
@@ -71,5 +71,10 @@ public class SimpleTrueOrFalseQuestion implements Question {
 
     public SimpleTrueOrFalseQuestion withId(Integer id) {
         return new SimpleTrueOrFalseQuestion(id, this.initialPhrase, this.answer);
+    }
+
+    @Override
+    public Integer id() {
+        return id;
     }
 }

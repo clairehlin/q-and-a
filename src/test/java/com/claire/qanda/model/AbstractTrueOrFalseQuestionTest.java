@@ -1,6 +1,5 @@
 package com.claire.qanda.model;
 
-import com.claire.qanda.model.Question;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -13,7 +12,6 @@ abstract class AbstractTrueOrFalseQuestionTest {
         assertDoesNotThrow(() ->
                 trueOrFalseQuestion("Trump is the current president.")
         );
-        System.out.println(trueOrFalseQuestion("Trump is the current president.").statement());
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.claire.qanda.services;
 
+import com.claire.qanda.model.IdentifiableQuestion;
 import com.claire.qanda.model.Question;
 import com.claire.qanda.repository.QuestionRepository;
 
@@ -17,7 +18,7 @@ public class SimpleQuestionsService implements QuestionsService {
     }
 
     @Override
-    public void addQuestion(Question question) {
+    public void addQuestion(IdentifiableQuestion question) {
         requireNonNull(question, "cannot process null question");
         db.save(question);
     }
@@ -25,5 +26,10 @@ public class SimpleQuestionsService implements QuestionsService {
     @Override
     public List<Question> list() {
         return unmodifiableList(db.list());
+    }
+
+    @Override
+    public Question get(Integer id) {
+        return db.getOpenQuestion(id);
     }
 }

@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.claire.qanda.repository.Database.applyDatabaseUpdatesFromFile;
 
@@ -24,7 +25,7 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     @Override
-    public IdentifiableQuestion save(Question question) {
+    public IdentifiableQuestion save(IdentifiableQuestion question) {
         if (question.getClass() == OpenQuestion.class) {
             return saveOpenQuestion((OpenQuestion) question);
         } else if (question.getClass() == SimpleTrueOrFalseQuestion.class) {
@@ -141,6 +142,28 @@ public class H2QuestionRepository implements QuestionRepository {
         questions.addAll(trueOrFalseQuestions());
         questions.addAll(multipleChoiceQuestions());
         return questions;
+    }
+
+    @Override
+    public IdentifiableQuestion getOpenQuestion(Integer id) {
+        String sql = "select * from open_question where id=?";
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                PreparedStatement stm = con.prepareStatement(sql)
+        ) {
+            stm.setInt(1, id);
+
+            final ResultSet resultSet = stm.executeQuery();
+
+            if (resultSet.next()) {
+                return new OpenQuestion(id, resultSet.getString("statement"), resultSet.getString("answer"));
+            } else {
+                throw new NoSuchElementException("cannot find open_question with id " + id);
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private Collection<? extends Question> multipleChoiceQuestions() {
