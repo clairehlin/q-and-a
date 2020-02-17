@@ -1,0 +1,1 @@
+curl -v -X PUT -H "Content-Type: application/json" -d '{ "statement" : "a-updated?", "answer" : "b-updated." }' http://localhost:8080/questions/$1

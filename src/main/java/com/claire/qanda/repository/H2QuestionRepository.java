@@ -166,6 +166,40 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
+    @Override
+    public void deleteQuestionWithId(Integer id) {
+        String sql = "delete from open_question where id = ?";
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                PreparedStatement stm = con.prepareStatement(sql)
+        ) {
+            stm.setInt(1, id);
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public void updateOpenQuestion(OpenQuestion openQuestion) {
+        {
+            String sql = "update open_question set statement = ?, answer = ? where id = ?";
+
+            try (
+                    Connection con = DriverManager.getConnection(url);
+                    PreparedStatement stm = con.prepareStatement(sql)
+            ) {
+                stm.setString(1, openQuestion.statement());
+                stm.setString(2, openQuestion.correctAnswer());
+                stm.setInt(3, openQuestion.id());
+                stm.executeUpdate();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
     private Collection<? extends Question> multipleChoiceQuestions() {
         String tableName = "multiple_choice_question";
         List<Question> questions = new ArrayList<>();

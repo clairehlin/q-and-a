@@ -1,0 +1,1 @@
+java -cp target/qanda-1.0-SNAPSHOT.jar com.claire.qanda.QuestionsApplication

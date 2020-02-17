@@ -1,11 +1,13 @@
 package com.claire.qanda.repository;
 
 import com.claire.qanda.model.IdentifiableQuestion;
+import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -39,9 +41,36 @@ public class SimpleQuestionRepository implements QuestionRepository {
                 .orElseThrow(NoSuchElementException::new);
     }
 
-    public IdentifiableQuestion getOpenQuestion2(Integer id) {
-        for (IdentifiableQuestion question : db){
+    @Override
+    public void deleteQuestionWithId(Integer id) {
+        final IdentifiableQuestion question = db.stream()
+                .filter(question1 -> question1.id().equals(id))
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
+        db.remove(question);
+    }
+
+    public void deleteQuestionWithId2(Integer id) {
+        for (IdentifiableQuestion question : db) {
             if (question.id().equals(id)){
+                db.remove(question);
+            }
+        }
+    }
+
+    @Override
+    public void updateOpenQuestion(OpenQuestion openQuestion) {
+        for (IdentifiableQuestion question : db) {
+            if (question.id().equals(openQuestion.id())){
+                db.remove(question);
+                db.add(openQuestion);
+            }
+        }
+    }
+
+    public IdentifiableQuestion getOpenQuestion2(Integer id) {
+        for (IdentifiableQuestion question : db) {
+            if (question.id().equals(id)) {
                 return question;
             }
         }

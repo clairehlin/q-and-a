@@ -1,6 +1,7 @@
 package com.claire.qanda.services;
 
 import com.claire.qanda.model.IdentifiableQuestion;
+import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
 import com.claire.qanda.repository.QuestionRepository;
 
@@ -31,5 +32,15 @@ public class SimpleQuestionsService implements QuestionsService {
     @Override
     public Question get(Integer id) {
         return db.getOpenQuestion(id);
+    }
+
+    @Override
+    public void deleteQuestionWithId(Integer id) {
+        db.deleteQuestionWithId(id);
+    }
+
+    @Override
+    public void updateOpenQuestion(OpenQuestion openQuestion) {
+        db.updateOpenQuestion(openQuestion);
     }
 }

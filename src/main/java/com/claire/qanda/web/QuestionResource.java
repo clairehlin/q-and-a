@@ -10,7 +10,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.inject.Singleton;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -50,4 +57,24 @@ public class QuestionResource {
         return objectMapper.writeValueAsString(questionsService.get(id));
 
     }
+
+    @DELETE
+    @Path("{id}")
+    public void deleteQuestionWithId(@PathParam("id") Integer id) throws JsonProcessingException {
+        questionsService.deleteQuestionWithId(id);
+    }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("{id}")
+    public void updateOpenQuestion(
+            @PathParam("id") Integer id,
+            WebOpenQuestion webOpenQuestion
+    ) {
+        questionsService.updateOpenQuestion(
+                new OpenQuestion(id, webOpenQuestion.statement, webOpenQuestion.answer)
+        );
+    }
+
+
 }
