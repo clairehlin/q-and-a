@@ -5,6 +5,7 @@ import com.claire.qanda.model.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
@@ -95,5 +96,40 @@ class H2QuestionRepositoryTest {
                 .stream()
                 .anyMatch(q -> q.statement().startsWith("what is the colour of ocean?"));
         assertTrue(savedQuestionsFound);
+    }
+
+    @Test
+    void can_update_open_question_in_database() throws IOException {
+        //given
+        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+
+        //when
+        OpenQuestion openQuestion = new OpenQuestion(
+                2,
+                "what is your favourite sports?",
+                "skiing"
+        );
+        h2QuestionRepository.updateOpenQuestion(openQuestion);
+
+        //then
+        final boolean updatedOpenQuestionFound = h2QuestionRepository.list()
+                .stream()
+                .anyMatch(q -> q.correctAnswer().startsWith("skiing"));
+        assertTrue(updatedOpenQuestionFound);
+    }
+
+    @Test
+    void can_delete_open_question_with_id() throws IOException {
+        //given
+        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+
+        //when
+        h2QuestionRepository.deleteQuestionWithId(2);
+
+        //then
+        assertEquals(h2QuestionRepository.list().size(), 3);
+
     }
 }
