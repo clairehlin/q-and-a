@@ -1,16 +1,16 @@
 package com.claire.qanda.repository;
 
-import com.claire.qanda.model.IdentifiableQuestion;
+import com.claire.qanda.model.Question;
 import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
 
 import java.util.List;
 
 public interface QuestionRepository {
-    IdentifiableQuestion save(IdentifiableQuestion question);
+    Question save(Question question);
     List<Question> list();
 
-    IdentifiableQuestion getOpenQuestion(Integer id);
+    Question getOpenQuestion(Integer id);
 
     void deleteQuestionWithId(Integer id);
 

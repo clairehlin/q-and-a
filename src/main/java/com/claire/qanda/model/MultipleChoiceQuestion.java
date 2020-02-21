@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
 
-public class MultipleChoiceQuestion implements IdentifiableQuestion {
+public class MultipleChoiceQuestion implements Question {
     private final String initialPhrase;
     private final List<String> choices = new ArrayList<>();
     private final int answer;

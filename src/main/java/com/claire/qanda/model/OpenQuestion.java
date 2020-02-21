@@ -1,6 +1,6 @@
 package com.claire.qanda.model;
 
-public class OpenQuestion implements IdentifiableQuestion {
+public class OpenQuestion implements Question {
     private final String statement;
     private final String answer;
     private final Integer id;

@@ -2,9 +2,12 @@ drop table if exists open_question;
 drop table if exists true_false_question;
 drop table if exists choice;
 drop table if exists multiple_choice_question;
+drop sequence if exists question_seq;
+
+create sequence question_seq;
 
 create table open_question (
-   id bigint identity,
+   id bigint default question_seq.nextval primary key,
    statement varchar(250) not null,
    answer varchar(500) not null
 );

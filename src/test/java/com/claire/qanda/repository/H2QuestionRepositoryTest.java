@@ -44,7 +44,7 @@ class H2QuestionRepositoryTest {
 
         //when
         OpenQuestion question = new OpenQuestion(null, "what day is today?", "Saturday");
-        IdentifiableQuestion savedQuestion = h2QuestionRepository.save(question);
+        Question savedQuestion = h2QuestionRepository.save(question);
 
         //then
         assertEquals(h2QuestionRepository.list().size(), 5);
@@ -66,7 +66,7 @@ class H2QuestionRepositoryTest {
                 null, "you are ok.",
                 true
         );
-        IdentifiableQuestion questions = h2QuestionRepository.save(simpleTrueOrFalseQuestion);
+        Question questions = h2QuestionRepository.save(simpleTrueOrFalseQuestion);
 
         //then
         assertEquals(h2QuestionRepository.list().size(), 5);
@@ -103,6 +103,7 @@ class H2QuestionRepositoryTest {
         //given
         H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
         applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+        final Question originalQuestion = h2QuestionRepository.getOpenQuestion(2);
 
         //when
         OpenQuestion openQuestion = new OpenQuestion(
@@ -113,10 +114,9 @@ class H2QuestionRepositoryTest {
         h2QuestionRepository.updateOpenQuestion(openQuestion);
 
         //then
-        final boolean updatedOpenQuestionFound = h2QuestionRepository.list()
-                .stream()
-                .anyMatch(q -> q.correctAnswer().startsWith("skiing"));
-        assertTrue(updatedOpenQuestionFound);
+        final Question updatedQuestion = h2QuestionRepository.getOpenQuestion(2);
+        assertNotEquals(originalQuestion.correctAnswer(), updatedQuestion.correctAnswer());
+        assertEquals(updatedQuestion.correctAnswer(), "skiing");
     }
 
     @Test
@@ -124,11 +124,13 @@ class H2QuestionRepositoryTest {
         //given
         H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
         applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+        final List<Question> originalList = h2QuestionRepository.list();
 
         //when
         h2QuestionRepository.deleteQuestionWithId(2);
 
         //then
+        assertEquals(originalList.size(), 4);
         assertEquals(h2QuestionRepository.list().size(), 3);
 
     }

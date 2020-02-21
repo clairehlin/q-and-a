@@ -25,7 +25,7 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     @Override
-    public IdentifiableQuestion save(IdentifiableQuestion question) {
+    public Question save(Question question) {
         if (question.getClass() == OpenQuestion.class) {
             return saveOpenQuestion((OpenQuestion) question);
         } else if (question.getClass() == SimpleTrueOrFalseQuestion.class) {
@@ -35,7 +35,7 @@ public class H2QuestionRepository implements QuestionRepository {
         } else {
             throw new IllegalArgumentException("cannot save question of type " + question.getClass().getName());
         }
-        return new QuestionToIdentifiableQuestionAdapter(question);
+        return question;
     }
 
     private MultipleChoiceQuestion saveMultipleChoiceQuestion(MultipleChoiceQuestion question) {
@@ -145,7 +145,7 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     @Override
-    public IdentifiableQuestion getOpenQuestion(Integer id) {
+    public Question getOpenQuestion(Integer id) {
         String sql = "select * from open_question where id=?";
 
         try (

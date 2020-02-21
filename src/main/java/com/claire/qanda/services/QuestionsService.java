@@ -1,13 +1,13 @@
 package com.claire.qanda.services;
 
-import com.claire.qanda.model.IdentifiableQuestion;
+import com.claire.qanda.model.Question;
 import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
 
 import java.util.List;
 
 public interface QuestionsService {
-    void addQuestion(IdentifiableQuestion question);
+    void addQuestion(Question question);
 
     List<Question> list();
 

@@ -1,6 +1,6 @@
 package com.claire.qanda.repository;
 
-import com.claire.qanda.model.IdentifiableQuestion;
+import com.claire.qanda.model.Question;
 import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
 
@@ -20,10 +20,10 @@ where can we call a method in java or a constructor?
  */
 public class SimpleQuestionRepository implements QuestionRepository {
 
-    private final List<IdentifiableQuestion> db = new ArrayList<>();
+    private final List<Question> db = new ArrayList<>();
 
     @Override
-    public IdentifiableQuestion save(IdentifiableQuestion question) {
+    public Question save(Question question) {
         db.add(question);
         return question;
     }
@@ -34,7 +34,7 @@ public class SimpleQuestionRepository implements QuestionRepository {
     }
 
     @Override
-    public IdentifiableQuestion getOpenQuestion(Integer id) {
+    public Question getOpenQuestion(Integer id) {
         return db.stream()
                 .filter(question -> question.id().equals(id))
                 .findFirst()
@@ -43,7 +43,7 @@ public class SimpleQuestionRepository implements QuestionRepository {
 
     @Override
     public void deleteQuestionWithId(Integer id) {
-        final IdentifiableQuestion question = db.stream()
+        final Question question = db.stream()
                 .filter(question1 -> question1.id().equals(id))
                 .findFirst()
                 .orElseThrow(NoSuchElementException::new);
@@ -51,7 +51,7 @@ public class SimpleQuestionRepository implements QuestionRepository {
     }
 
     public void deleteQuestionWithId2(Integer id) {
-        for (IdentifiableQuestion question : db) {
+        for (Question question : db) {
             if (question.id().equals(id)){
                 db.remove(question);
             }
@@ -60,7 +60,7 @@ public class SimpleQuestionRepository implements QuestionRepository {
 
     @Override
     public void updateOpenQuestion(OpenQuestion openQuestion) {
-        for (IdentifiableQuestion question : db) {
+        for (Question question : db) {
             if (question.id().equals(openQuestion.id())){
                 db.remove(question);
                 db.add(openQuestion);
@@ -68,8 +68,8 @@ public class SimpleQuestionRepository implements QuestionRepository {
         }
     }
 
-    public IdentifiableQuestion getOpenQuestion2(Integer id) {
-        for (IdentifiableQuestion question : db) {
+    public Question getOpenQuestion2(Integer id) {
+        for (Question question : db) {
             if (question.id().equals(id)) {
                 return question;
             }

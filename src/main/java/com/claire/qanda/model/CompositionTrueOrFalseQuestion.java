@@ -40,4 +40,12 @@ class CompositionTrueOrFalseQuestion implements Question {
     public String correctAnswer() {
         return multipleChoiceQuestion.correctAnswer();
     }
+
+    @Override
+    public Integer id() {
+        return multipleChoiceQuestion.id();
+    }
+
+
+
 }
