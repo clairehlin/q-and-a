@@ -15,4 +15,6 @@ public interface QuestionRepository {
     void deleteQuestionWithId(Integer id);
 
     void updateOpenQuestion(OpenQuestion openQuestion);
+
+    Question getQuestion(Integer id);
 }

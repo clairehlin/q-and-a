@@ -31,7 +31,7 @@ public class SimpleQuestionsService implements QuestionsService {
 
     @Override
     public Question get(Integer id) {
-        return db.getOpenQuestion(id);
+        return db.getQuestion(id);
     }
 
     @Override

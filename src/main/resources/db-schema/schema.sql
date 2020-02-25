@@ -13,13 +13,13 @@ create table open_question (
 );
 
 create table true_false_question (
-   id bigint identity,
+   id bigint default question_seq.nextval primary key,
    initial_phrase varchar(250) not null,
    answer boolean not null
 );
 
 create table multiple_choice_question (
-   id bigint identity,
+   id bigint default question_seq.nextval primary key,
    initial_phrase varchar(250) not null
 );
 

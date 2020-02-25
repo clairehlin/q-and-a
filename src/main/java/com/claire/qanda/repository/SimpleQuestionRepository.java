@@ -68,6 +68,11 @@ public class SimpleQuestionRepository implements QuestionRepository {
         }
     }
 
+    @Override
+    public Question getQuestion(Integer id) {
+        return null;
+    }
+
     public Question getOpenQuestion2(Integer id) {
         for (Question question : db) {
             if (question.id().equals(id)) {

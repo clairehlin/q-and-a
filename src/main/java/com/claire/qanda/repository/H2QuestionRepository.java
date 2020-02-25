@@ -200,6 +200,16 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
+    @Override
+    public Question getQuestion(Integer id) {
+        try {
+            return getOpenQuestion(id);
+        } catch (RuntimeException e) {
+            System.out.println("cannot find question with id " + id);
+        }
+        return null;
+    }
+
     private Collection<? extends Question> multipleChoiceQuestions() {
         String tableName = "multiple_choice_question";
         List<Question> questions = new ArrayList<>();
