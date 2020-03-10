@@ -1,18 +1,23 @@
 package com.claire.qanda.repository;
 
 import com.claire.qanda.common.IO;
-import com.claire.qanda.model.*;
+import com.claire.qanda.model.MultipleChoiceQuestion;
+import com.claire.qanda.model.OpenQuestion;
+import com.claire.qanda.model.Question;
+import com.claire.qanda.model.SimpleTrueOrFalseQuestion;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
 import static com.claire.qanda.repository.Database.applyDatabaseUpdatesFromFile;
 import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class H2QuestionRepositoryTest {
     private static String dbUrl;
@@ -103,7 +108,7 @@ class H2QuestionRepositoryTest {
         //given
         H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
         applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
-        final Question originalQuestion = h2QuestionRepository.getOpenQuestion(2);
+        final Question originalQuestion = h2QuestionRepository.getQuestion(2);
 
         //when
         OpenQuestion openQuestion = new OpenQuestion(
@@ -114,7 +119,7 @@ class H2QuestionRepositoryTest {
         h2QuestionRepository.updateOpenQuestion(openQuestion);
 
         //then
-        final Question updatedQuestion = h2QuestionRepository.getOpenQuestion(2);
+        final Question updatedQuestion = h2QuestionRepository.getQuestion(2);
         assertNotEquals(originalQuestion.correctAnswer(), updatedQuestion.correctAnswer());
         assertEquals(updatedQuestion.correctAnswer(), "skiing");
     }

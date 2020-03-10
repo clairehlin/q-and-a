@@ -34,7 +34,7 @@ public class SimpleQuestionRepository implements QuestionRepository {
     }
 
     @Override
-    public Question getOpenQuestion(Integer id) {
+    public Question getQuestion(Integer id) {
         return db.stream()
                 .filter(question -> question.id().equals(id))
                 .findFirst()
@@ -66,11 +66,6 @@ public class SimpleQuestionRepository implements QuestionRepository {
                 db.add(openQuestion);
             }
         }
-    }
-
-    @Override
-    public Question getQuestion(Integer id) {
-        return null;
     }
 
     public Question getOpenQuestion2(Integer id) {

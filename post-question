@@ -1,1 +1,0 @@
-curl -v -X POST -H "Content-Type: application/json" -d '{ "statement" : "a?", "answer" : "b." }' http://localhost:8080/questions

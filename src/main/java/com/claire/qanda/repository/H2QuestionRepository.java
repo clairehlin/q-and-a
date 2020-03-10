@@ -144,9 +144,8 @@ public class H2QuestionRepository implements QuestionRepository {
         return questions;
     }
 
-    @Override
-    public Question getOpenQuestion(Integer id) {
-        String sql = "select * from open_question where id=?";
+    private Question getOpenQuestion(Integer id) {
+        String sql = "select * from open_question where id = ?";
 
         try (
                 Connection con = DriverManager.getConnection(url);
@@ -159,7 +158,7 @@ public class H2QuestionRepository implements QuestionRepository {
             if (resultSet.next()) {
                 return new OpenQuestion(id, resultSet.getString("statement"), resultSet.getString("answer"));
             } else {
-                throw new NoSuchElementException("cannot find open_question with id " + id);
+                return null;
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -202,12 +201,77 @@ public class H2QuestionRepository implements QuestionRepository {
 
     @Override
     public Question getQuestion(Integer id) {
-        try {
-            return getOpenQuestion(id);
-        } catch (RuntimeException e) {
-            System.out.println("cannot find question with id " + id);
+        Question openQuestion = getOpenQuestion(id);
+        if (openQuestion != null) {
+            return openQuestion;
+        } else {
+            Question trueOrFalseQuestion = getTrueOrFalseQuestion(id);
+            if (trueOrFalseQuestion != null) {
+                return trueOrFalseQuestion;
+            } else {
+                Question multipleChoiceQuestion = getMultipleChoiceQuestion (id);
+                if (multipleChoiceQuestion != null) {
+                    return multipleChoiceQuestion;
+                } else {
+                    throw new NoSuchElementException("cannot find question with id: " + id);
+                }
+            }
         }
-        return null;
+    }
+
+    private Question getMultipleChoiceQuestion(Integer id) {
+        List<Question> questions = new ArrayList<>();
+
+        String sql = "select * from multiple_choice_question where id = ?";
+        try (
+                Connection con = DriverManager.getConnection(url);
+                PreparedStatement stm = con.prepareStatement(sql)
+        ) {
+            stm.setInt(1, id);
+
+            final ResultSet resultSet = stm.executeQuery();
+
+            if (resultSet.next()) {
+                String initialPhrase = resultSet.getString(2);
+                List<String> choices = getChoices(id);
+                int answer = getAnswer(id);
+                MultipleChoiceQuestion question = new MultipleChoiceQuestion(
+                        id, initialPhrase,
+                        choices,
+                        answer
+                );
+                return question;
+            } else {
+                return null;
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private Question getTrueOrFalseQuestion(Integer id) {
+        String sql = "select * from true_false_question where id = ?";
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                PreparedStatement stm = con.prepareStatement(sql)
+        ) {
+            stm.setInt(1, id);
+
+            final ResultSet resultSet = stm.executeQuery();
+
+            if (resultSet.next()) {
+                return new SimpleTrueOrFalseQuestion(
+                        id,
+                        resultSet.getString("initial_phrase"),
+                        resultSet.getBoolean("answer")
+                );
+            } else {
+                return null;
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private Collection<? extends Question> multipleChoiceQuestions() {
