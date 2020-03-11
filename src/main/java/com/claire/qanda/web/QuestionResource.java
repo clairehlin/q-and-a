@@ -1,7 +1,9 @@
 package com.claire.qanda.web;
 
+import com.claire.qanda.model.MultipleChoiceQuestion;
 import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
+import com.claire.qanda.model.SimpleTrueOrFalseQuestion;
 import com.claire.qanda.services.QuestionsService;
 import com.claire.qanda.web.model.WebQuestion;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -31,7 +33,8 @@ public class QuestionResource {
 
     private final QuestionsService questionsService;
     private final ObjectMapper objectMapper;
-    private final Map<String, Consumer<WebQuestion> > addQuestionOperations;
+    private final Map<String, Consumer<WebQuestion>> addQuestionOperations;
+    private final Map<String, Consumer<WebQuestion>> updateQuestionOperations;
 
     public QuestionResource(QuestionsService questionsService, ObjectMapper objectMapper) {
         this.questionsService = questionsService;
@@ -40,14 +43,23 @@ public class QuestionResource {
         this.objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
         this.addQuestionOperations = addOperations(questionsService);
+        this.updateQuestionOperations = updateOperations(questionsService);
     }
 
     private Map<String, Consumer<WebQuestion>> addOperations(QuestionsService questionsService) {
-        Map<String, Consumer<WebQuestion> > addQuestionOperations = new HashMap<>();
+        Map<String, Consumer<WebQuestion>> addQuestionOperations = new HashMap<>();
         addQuestionOperations.put("OpenQuestion", new AddOpenQuestion(questionsService));
         addQuestionOperations.put("TrueOrFalseQuestion", new AddTrueOrFalseQuestion(questionsService));
         addQuestionOperations.put("MultipleChoiceQuestion", new AddMultipleChoiceQuestion(questionsService));
         return addQuestionOperations;
+    }
+
+    private Map<String, Consumer<WebQuestion>> updateOperations(QuestionsService questionsService) {
+        Map<String, Consumer<WebQuestion>> updateQuestionOperations = new HashMap<>();
+        updateQuestionOperations.put(OpenQuestion.class.getName(), new UpdateOpenQuestion(questionsService));
+        updateQuestionOperations.put(SimpleTrueOrFalseQuestion.class.getName(), new AddTrueOrFalseQuestion(questionsService));
+        updateQuestionOperations.put(MultipleChoiceQuestion.class.getName(), new AddMultipleChoiceQuestion(questionsService));
+        return updateQuestionOperations;
     }
 
     @GET
@@ -80,12 +92,12 @@ public class QuestionResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    public void updateOpenQuestion(
+    public void updateQuestion(
             @PathParam("id") Integer id,
             WebQuestion webQuestion
     ) {
-        questionsService.updateOpenQuestion(
-                new OpenQuestion(id, webQuestion.statement, webQuestion.answer)
-        );
+        String questionType = questionsService.get(id).getClass().getName();
+        this.updateQuestionOperations.getOrDefault(questionType, new FailedUpdateQuestion(questionType))
+                .accept(webQuestion);
     }
 }

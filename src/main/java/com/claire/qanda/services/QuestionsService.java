@@ -16,4 +16,6 @@ public interface QuestionsService {
     void deleteQuestionWithId(Integer id);
 
     void updateOpenQuestion(OpenQuestion openQuestion);
+
+    void updateQuestion(Question question);
 }

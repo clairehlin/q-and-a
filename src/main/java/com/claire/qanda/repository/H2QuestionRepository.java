@@ -29,13 +29,12 @@ public class H2QuestionRepository implements QuestionRepository {
         if (question.getClass() == OpenQuestion.class) {
             return saveOpenQuestion((OpenQuestion) question);
         } else if (question.getClass() == SimpleTrueOrFalseQuestion.class) {
-            saveSimpleTrueOrFalseQuestion((SimpleTrueOrFalseQuestion) question);
+            return saveSimpleTrueOrFalseQuestion((SimpleTrueOrFalseQuestion) question);
         } else if (question.getClass() == MultipleChoiceQuestion.class) {
-            saveMultipleChoiceQuestion((MultipleChoiceQuestion) question);
+            return saveMultipleChoiceQuestion((MultipleChoiceQuestion) question);
         } else {
             throw new IllegalArgumentException("cannot save question of type " + question.getClass().getName());
         }
-        return question;
     }
 
     private MultipleChoiceQuestion saveMultipleChoiceQuestion(MultipleChoiceQuestion question) {
@@ -180,8 +179,7 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
-    @Override
-    public void updateOpenQuestion(OpenQuestion openQuestion) {
+    private void updateOpenQuestion(OpenQuestion openQuestion) {
         {
             String sql = "update open_question set statement = ?, answer = ? where id = ?";
 
@@ -209,7 +207,7 @@ public class H2QuestionRepository implements QuestionRepository {
             if (trueOrFalseQuestion != null) {
                 return trueOrFalseQuestion;
             } else {
-                Question multipleChoiceQuestion = getMultipleChoiceQuestion (id);
+                Question multipleChoiceQuestion = getMultipleChoiceQuestion(id);
                 if (multipleChoiceQuestion != null) {
                     return multipleChoiceQuestion;
                 } else {
@@ -217,6 +215,26 @@ public class H2QuestionRepository implements QuestionRepository {
                 }
             }
         }
+    }
+
+    @Override
+    public void updateQuestion(Question question) {
+        if (question.getClass() == OpenQuestion.class) {
+            updateOpenQuestion((OpenQuestion) question);
+        } else if (question.getClass() == SimpleTrueOrFalseQuestion.class) {
+            updateSimpleTrueOrFalseQuestion((SimpleTrueOrFalseQuestion) question);
+        } else if (question.getClass() == MultipleChoiceQuestion.class) {
+            updateMultipleChoiceQuestion((MultipleChoiceQuestion) question);
+        } else {
+            throw new IllegalArgumentException("cannot update question of type " + question.getClass().getName());
+        }
+    }
+
+    private void updateMultipleChoiceQuestion(MultipleChoiceQuestion question) {
+    }
+
+    private void updateSimpleTrueOrFalseQuestion(SimpleTrueOrFalseQuestion question) {
+
     }
 
     private Question getMultipleChoiceQuestion(Integer id) {

@@ -1,13 +1,10 @@
 package com.claire.qanda.repository;
 
 import com.claire.qanda.model.Question;
-import com.claire.qanda.model.OpenQuestion;
-import com.claire.qanda.model.Question;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -59,11 +56,11 @@ public class SimpleQuestionRepository implements QuestionRepository {
     }
 
     @Override
-    public void updateOpenQuestion(OpenQuestion openQuestion) {
-        for (Question question : db) {
-            if (question.id().equals(openQuestion.id())){
-                db.remove(question);
-                db.add(openQuestion);
+    public void updateQuestion(Question question) {
+        for (Question q : db) {
+            if (question.id().equals(q.id())){
+                db.remove(q);
+                db.add(question);
             }
         }
     }
