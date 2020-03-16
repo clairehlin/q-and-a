@@ -5,7 +5,6 @@ import com.claire.qanda.services.QuestionsService;
 import com.claire.qanda.web.model.WebQuestion;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class UpdateOpenQuestion implements BiConsumer<Integer, WebQuestion> {
     private final QuestionsService questionsService;
@@ -19,6 +18,5 @@ public class UpdateOpenQuestion implements BiConsumer<Integer, WebQuestion> {
         questionsService.updateQuestion(
                 new OpenQuestion(id, webQuestion.statement, webQuestion.answer)
         );
-
     }
 }

@@ -22,6 +22,5 @@ public class UpdateTrueOrFalseQuestion implements BiConsumer<Integer, WebQuestio
                         Boolean.parseBoolean(webQuestion.answer)
                 )
         );
-
     }
 }

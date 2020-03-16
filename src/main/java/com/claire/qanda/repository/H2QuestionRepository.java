@@ -179,24 +179,6 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
-    void updateOpenQuestion(OpenQuestion openQuestion) {
-        {
-            String sql = "update open_question set statement = ?, answer = ? where id = ?";
-
-            try (
-                    Connection con = DriverManager.getConnection(url);
-                    PreparedStatement stm = con.prepareStatement(sql)
-            ) {
-                stm.setString(1, openQuestion.statement());
-                stm.setString(2, openQuestion.correctAnswer());
-                stm.setInt(3, openQuestion.id());
-                stm.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-    }
-
     @Override
     public Question getQuestion(Integer id) {
         Question openQuestion = getOpenQuestion(id);
@@ -230,11 +212,73 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
+    void updateOpenQuestion(OpenQuestion question) {
+        {
+            String sql = "update open_question set statement = ?, answer = ? where id = ?";
+
+            try (
+                    Connection con = DriverManager.getConnection(url);
+                    PreparedStatement stm = con.prepareStatement(sql)
+            ) {
+                stm.setString(1, question.statement());
+                stm.setString(2, question.correctAnswer());
+                stm.setInt(3, question.id());
+                stm.executeUpdate();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
     private void updateMultipleChoiceQuestion(MultipleChoiceQuestion question) {
+        String sql = "update multiple_choice_question set initial_phrase = ? where id = ? ";
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                PreparedStatement stm = con.prepareStatement(sql)
+        ) {
+            //setString(parameterIndex: 1, ....) means replace the above one (?) with the value in
+            // the second parameter which is question.getInitialPhrase()
+            stm.setString(1, question.getInitialPhrase());
+            stm.setInt(2, question.id());
+            deleteChoicesForQuestionWithId(question.id());
+            saveChoices(con, question.id(), question.getChoices(), question.correctAnswer());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void deleteChoicesForQuestionWithId(Integer id) {
+        String sql = "delete from choice where multiple_choice_question_id = ?";
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                PreparedStatement stm = con.prepareStatement(sql)
+        ) {
+            stm.setInt(1, id);
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private void updateSimpleTrueOrFalseQuestion(SimpleTrueOrFalseQuestion question) {
+        {
+            String sql = "update true_false_question set initial_phrase = ?, answer = ? where id = ?";
 
+            try (
+                    Connection con = DriverManager.getConnection(url);
+                    PreparedStatement stm = con.prepareStatement(sql)
+            ) {
+                stm.setString(1, question.getInitialPhrase());
+                stm.setString(2, question.correctAnswer());
+                stm.setInt(3, question.id());
+                stm.executeUpdate();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 
     private Question getMultipleChoiceQuestion(Integer id) {
