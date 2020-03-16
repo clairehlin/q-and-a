@@ -179,7 +179,7 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
-    private void updateOpenQuestion(OpenQuestion openQuestion) {
+    void updateOpenQuestion(OpenQuestion openQuestion) {
         {
             String sql = "update open_question set statement = ?, answer = ? where id = ?";
 

@@ -25,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @Path("/questions")
@@ -34,7 +35,7 @@ public class QuestionResource {
     private final QuestionsService questionsService;
     private final ObjectMapper objectMapper;
     private final Map<String, Consumer<WebQuestion>> addQuestionOperations;
-    private final Map<String, Consumer<WebQuestion>> updateQuestionOperations;
+    private final Map<String, BiConsumer<Integer, WebQuestion>> updateQuestionOperations;
 
     public QuestionResource(QuestionsService questionsService, ObjectMapper objectMapper) {
         this.questionsService = questionsService;
@@ -54,11 +55,11 @@ public class QuestionResource {
         return addQuestionOperations;
     }
 
-    private Map<String, Consumer<WebQuestion>> updateOperations(QuestionsService questionsService) {
-        Map<String, Consumer<WebQuestion>> updateQuestionOperations = new HashMap<>();
+    private Map<String, BiConsumer<Integer, WebQuestion>> updateOperations(QuestionsService questionsService) {
+        Map<String, BiConsumer<Integer, WebQuestion>> updateQuestionOperations = new HashMap<>();
         updateQuestionOperations.put(OpenQuestion.class.getName(), new UpdateOpenQuestion(questionsService));
-        updateQuestionOperations.put(SimpleTrueOrFalseQuestion.class.getName(), new AddTrueOrFalseQuestion(questionsService));
-        updateQuestionOperations.put(MultipleChoiceQuestion.class.getName(), new AddMultipleChoiceQuestion(questionsService));
+        updateQuestionOperations.put(SimpleTrueOrFalseQuestion.class.getName(), new UpdateTrueOrFalseQuestion(questionsService));
+        updateQuestionOperations.put(MultipleChoiceQuestion.class.getName(), new UpdateMultipleChoiceQuestion(questionsService));
         return updateQuestionOperations;
     }
 
@@ -98,6 +99,6 @@ public class QuestionResource {
     ) {
         String questionType = questionsService.get(id).getClass().getName();
         this.updateQuestionOperations.getOrDefault(questionType, new FailedUpdateQuestion(questionType))
-                .accept(webQuestion);
+                .accept(id, webQuestion);
     }
 }

@@ -40,11 +40,6 @@ public class SimpleQuestionsService implements QuestionsService {
     }
 
     @Override
-    public void updateOpenQuestion(OpenQuestion openQuestion) {
-        db.updateOpenQuestion(openQuestion);
-    }
-
-    @Override
     public void updateQuestion(Question question) {
         db.updateQuestion(question);
     }
