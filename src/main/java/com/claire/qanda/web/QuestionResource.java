@@ -85,14 +85,14 @@ public class QuestionResource {
     }
 
     @DELETE
-    @Path("{id}")
+    @Path("/{id}")
     public void deleteQuestionWithId(@PathParam("id") Integer id) {
         questionsService.deleteQuestionWithId(id);
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("{id}")
+    @Path("/{id}")
     public void updateQuestion(
             @PathParam("id") Integer id,
             WebQuestion webQuestion

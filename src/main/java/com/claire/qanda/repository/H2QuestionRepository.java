@@ -164,8 +164,7 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
-    @Override
-    public void deleteQuestionWithId(Integer id) {
+    private boolean deleteOpenQuestionSuccessful(Integer id) {
         String sql = "delete from open_question where id = ?";
 
         try (
@@ -173,7 +172,49 @@ public class H2QuestionRepository implements QuestionRepository {
                 PreparedStatement stm = con.prepareStatement(sql)
         ) {
             stm.setInt(1, id);
-            stm.executeUpdate();
+            return stm.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public void deleteQuestionWithId(Integer id) {
+        if (deleteOpenQuestionSuccessful(id)){
+            return;
+        } else if (deleteTrueOrFalseQuestionSuccessful(id)) {
+            return;
+        } else if (deleteMultipleChoiceQuestionSuccessful(id)) {
+            return;
+        } else {
+            throw new NoSuchElementException("cannot find question with id: " + id);
+        }
+    }
+
+    private boolean deleteMultipleChoiceQuestionSuccessful(Integer id) {
+        deleteChoicesForQuestionWithId(id);
+        String sql = "delete from multiple_choice_question where id = ?";
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                PreparedStatement stm = con.prepareStatement(sql)
+        ) {
+            stm.setInt(1, id);
+            return stm.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private boolean deleteTrueOrFalseQuestionSuccessful(Integer id) {
+        String sql = "delete from true_false_question where id = ?";
+
+        try (
+                Connection con = DriverManager.getConnection(url);
+                PreparedStatement stm = con.prepareStatement(sql)
+        ) {
+            stm.setInt(1, id);
+            return stm.executeUpdate() > 0;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
@@ -282,8 +323,6 @@ public class H2QuestionRepository implements QuestionRepository {
     }
 
     private Question getMultipleChoiceQuestion(Integer id) {
-        List<Question> questions = new ArrayList<>();
-
         String sql = "select * from multiple_choice_question where id = ?";
         try (
                 Connection con = DriverManager.getConnection(url);
