@@ -242,18 +242,22 @@ public class H2QuestionRepository implements QuestionRepository {
 
     @Override
     public void updateQuestion(Question question) {
+        int countUpdated;
         if (question.getClass() == OpenQuestion.class) {
-            updateOpenQuestion((OpenQuestion) question);
+            countUpdated = updateOpenQuestion((OpenQuestion) question);
         } else if (question.getClass() == SimpleTrueOrFalseQuestion.class) {
-            updateSimpleTrueOrFalseQuestion((SimpleTrueOrFalseQuestion) question);
+            countUpdated = updateSimpleTrueOrFalseQuestion((SimpleTrueOrFalseQuestion) question);
         } else if (question.getClass() == MultipleChoiceQuestion.class) {
-            updateMultipleChoiceQuestion((MultipleChoiceQuestion) question);
+            countUpdated = updateMultipleChoiceQuestion((MultipleChoiceQuestion) question);
         } else {
             throw new IllegalArgumentException("cannot update question of type " + question.getClass().getName());
         }
+        if (countUpdated < 1) {
+            throw new NoSuchElementException("cannot find question with id " + question.id());
+        }
     }
 
-    void updateOpenQuestion(OpenQuestion question) {
+    private int updateOpenQuestion(OpenQuestion question) {
         {
             String sql = "update open_question set statement = ?, answer = ? where id = ?";
 
@@ -264,14 +268,14 @@ public class H2QuestionRepository implements QuestionRepository {
                 stm.setString(1, question.statement());
                 stm.setString(2, question.correctAnswer());
                 stm.setInt(3, question.id());
-                stm.executeUpdate();
+                return stm.executeUpdate();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
         }
     }
 
-    private void updateMultipleChoiceQuestion(MultipleChoiceQuestion question) {
+    private int updateMultipleChoiceQuestion(MultipleChoiceQuestion question) {
         String sql = "update multiple_choice_question set initial_phrase = ? where id = ? ";
 
         try (
@@ -284,7 +288,7 @@ public class H2QuestionRepository implements QuestionRepository {
             stm.setInt(2, question.id());
             deleteChoicesForQuestionWithId(question.id());
             saveChoices(con, question.id(), question.getChoices(), question.correctAnswer());
-            stm.executeUpdate();
+            return stm.executeUpdate();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
@@ -304,7 +308,7 @@ public class H2QuestionRepository implements QuestionRepository {
         }
     }
 
-    private void updateSimpleTrueOrFalseQuestion(SimpleTrueOrFalseQuestion question) {
+    private int updateSimpleTrueOrFalseQuestion(SimpleTrueOrFalseQuestion question) {
         {
             String sql = "update true_false_question set initial_phrase = ?, answer = ? where id = ?";
 
@@ -315,7 +319,7 @@ public class H2QuestionRepository implements QuestionRepository {
                 stm.setString(1, question.getInitialPhrase());
                 stm.setString(2, question.correctAnswer());
                 stm.setInt(3, question.id());
-                stm.executeUpdate();
+                return stm.executeUpdate();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
