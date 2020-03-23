@@ -6,6 +6,7 @@ import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
 import com.claire.qanda.model.SimpleTrueOrFalseQuestion;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -30,197 +31,295 @@ class H2QuestionRepositoryTest {
         dbUrl = dbConfig.getProperty("db.url");
     }
 
-    @Test
-    void can_list_questions_from_database() throws IOException {
-        // given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+    @Nested
+    class SavingQuestions {
+        @Test
+        void can_save_multiple_choice_questions() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
 
-        // when
-        final List<Question> questions = h2QuestionRepository.list();
+            //when
+            MultipleChoiceQuestion multipleChoiceQuestion = new MultipleChoiceQuestion(
+                    "what is the colour of ocean?",
+                    asList("green", "blue"),
+                    1
+            );
+            Question questions = h2QuestionRepository.save(multipleChoiceQuestion);
 
-        // then
-        assertEquals(questions.size(), 4);
+            //then
+            assertEquals(h2QuestionRepository.list().size(), 5);
+            final boolean savedQuestionsFound = h2QuestionRepository.list()
+                    .stream()
+                    .anyMatch(q -> q.statement().startsWith("what is the colour of ocean?"));
+            assertTrue(savedQuestionsFound);
+        }
+
+        @Test
+        void can_save_true_false_question_to_database() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+
+            //when
+            SimpleTrueOrFalseQuestion simpleTrueOrFalseQuestion = new SimpleTrueOrFalseQuestion(
+                    null, "you are ok.",
+                    true
+            );
+            Question questions = h2QuestionRepository.save(simpleTrueOrFalseQuestion);
+
+            //then
+            assertEquals(h2QuestionRepository.list().size(), 5);
+            final boolean savedQuestionFound = h2QuestionRepository.list()
+                    .stream()
+                    .anyMatch(q -> q.statement().startsWith("you are ok."));
+            assertTrue(savedQuestionFound);
+        }
+
+        @Test
+        void can_save_open_questions_to_database() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+
+            //when
+            OpenQuestion question = new OpenQuestion(null, "what day is today?", "Saturday");
+            Question savedQuestion = h2QuestionRepository.save(question);
+
+            //then
+            assertEquals(h2QuestionRepository.list().size(), 5);
+            final boolean savedQuestionFound = h2QuestionRepository.list()
+                    .stream()
+                    .anyMatch(q -> q.statement().equals("what day is today?"));
+            assertTrue(savedQuestionFound);
+            assertNotNull(savedQuestion.id());
+        }
+
+        @Test
+        void cannot_save_question_of_unknown_type_to_database() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+
+            //when
+            //then
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> h2QuestionRepository.save(new UkownQuestionType())
+            );
+        }
     }
 
-    @Test
-    void can_save_open_questions_to_database() throws IOException {
-        //given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+    @Nested
+    class DeletingQuestions {
+        @Test
+        void cannot_delete_question_with_non_existing_id() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+            final List<Question> originalList = h2QuestionRepository.list();
 
-        //when
-        OpenQuestion question = new OpenQuestion(null, "what day is today?", "Saturday");
-        Question savedQuestion = h2QuestionRepository.save(question);
+            //when
+            //then
+            assertThrows(
+                    NoSuchElementException.class,
+                    () -> h2QuestionRepository.deleteQuestionWithId(7)
+            );
+        }
 
-        //then
-        assertEquals(h2QuestionRepository.list().size(), 5);
-        final boolean savedQuestionFound = h2QuestionRepository.list()
-                .stream()
-                .anyMatch(q -> q.statement().equals("what day is today?"));
-        assertTrue(savedQuestionFound);
-        assertNotNull(savedQuestion.id());
+        @Test
+        void can_delete_open_question_with_id() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+            final List<Question> originalList = h2QuestionRepository.list();
+
+            //when
+            h2QuestionRepository.deleteQuestionWithId(2);
+
+            //then
+            assertEquals(originalList.size(), 4);
+            assertEquals(h2QuestionRepository.list().size(), 3);
+        }
     }
 
-    @Test
-    void can_save_true_false_question_to_database() throws IOException {
-        //given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+    @Nested
+    class GettingQuestions {
 
-        //when
-        SimpleTrueOrFalseQuestion simpleTrueOrFalseQuestion = new SimpleTrueOrFalseQuestion(
-                null, "you are ok.",
-                true
-        );
-        Question questions = h2QuestionRepository.save(simpleTrueOrFalseQuestion);
+        @Test
+        void can_list_questions_from_database() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
 
-        //then
-        assertEquals(h2QuestionRepository.list().size(), 5);
-        final boolean savedQuestionFound = h2QuestionRepository.list()
-                .stream()
-                .anyMatch(q -> q.statement().startsWith("you are ok."));
-        assertTrue(savedQuestionFound);
+            //when
+            final List<Question> questions = h2QuestionRepository.list();
+
+            //then
+            assertEquals(questions.size(), 4);
+        }
+
+        @Test
+        void can_get_open_question_with_id() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+
+            //when
+            Question openQuestion = h2QuestionRepository.getQuestion(1);
+
+            //then
+            assertEquals(openQuestion.getClass(), OpenQuestion.class);
+            assertEquals("how are you?", openQuestion.statement());
+            assertEquals("I am well", openQuestion.correctAnswer());
+        }
+
+        @Test
+        void can_get_true_or_false_question_with_id() throws IOException {
+            // given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+
+            //when
+            Question trueOrFalseQuestion = h2QuestionRepository.getQuestion(3);
+
+            //then
+            assertEquals(trueOrFalseQuestion.getClass(), SimpleTrueOrFalseQuestion.class);
+            assertEquals("you are well.\n1. true\n2. false", trueOrFalseQuestion.statement());
+            assertEquals("true", trueOrFalseQuestion.correctAnswer());
+        }
+
+        @Test
+        void can_get_multiple_choice_question_with_id() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+
+            //when
+            Question multipleChoiceQuestion = h2QuestionRepository.getQuestion(4);
+
+            //then
+            assertEquals(multipleChoiceQuestion.getClass(), MultipleChoiceQuestion.class);
+            assertEquals("how old are you?\n1. 25 years old\n2. 26 years old", multipleChoiceQuestion.statement());
+            assertEquals("25 years old", multipleChoiceQuestion.correctAnswer());
+        }
+
+        @Test
+        void cannot_get_question_with_non_existing_id() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+
+            //when
+            //then
+            assertThrows(NoSuchElementException.class,
+                    () -> h2QuestionRepository.getQuestion(7));
+        }
     }
 
-    @Test
-    void can_save_multiple_choice_questions() throws IOException {
-        //given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+    @Nested
+    class UpdatingQuestions {
+        @Test
+        void can_update_open_question_in_database() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+            final Question originalQuestion = h2QuestionRepository.getQuestion(2);
 
-        //when
-        MultipleChoiceQuestion multipleChoiceQuestion = new MultipleChoiceQuestion(
-                "what is the colour of ocean?",
-                asList("green", "blue"),
-                1
-        );
-        Question questions = h2QuestionRepository.save(multipleChoiceQuestion);
+            //when
+            OpenQuestion openQuestion = new OpenQuestion(
+                    2,
+                    "what is your favourite sports?",
+                    "skiing"
+            );
+            h2QuestionRepository.updateQuestion(openQuestion);
 
-        //then
-        assertEquals(h2QuestionRepository.list().size(), 5);
-        final boolean savedQuestionsFound = h2QuestionRepository.list()
-                .stream()
-                .anyMatch(q -> q.statement().startsWith("what is the colour of ocean?"));
-        assertTrue(savedQuestionsFound);
-    }
+            //then
+            final Question updatedQuestion = h2QuestionRepository.getQuestion(2);
+            assertNotEquals(originalQuestion.correctAnswer(), updatedQuestion.correctAnswer());
+            assertEquals(updatedQuestion.correctAnswer(), "skiing");
+        }
 
-    @Test
-    void can_update_open_question_in_database() throws IOException {
-        //given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
-        final Question originalQuestion = h2QuestionRepository.getQuestion(2);
+        @Test
+        void can_update_true_or_false_question_in_database() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+            final Question originalQuestion = h2QuestionRepository.getQuestion(3);
 
-        //when
-        OpenQuestion openQuestion = new OpenQuestion(
-                2,
-                "what is your favourite sports?",
-                "skiing"
-        );
-        h2QuestionRepository.updateQuestion(openQuestion);
+            //when
+            SimpleTrueOrFalseQuestion simpleTrueOrFalseQuestion = new SimpleTrueOrFalseQuestion(
+                    3,
+                    "you are well.",
+                    false
+            );
+            h2QuestionRepository.updateQuestion(simpleTrueOrFalseQuestion);
 
-        //then
-        final Question updatedQuestion = h2QuestionRepository.getQuestion(2);
-        assertNotEquals(originalQuestion.correctAnswer(), updatedQuestion.correctAnswer());
-        assertEquals(updatedQuestion.correctAnswer(), "skiing");
-    }
+            //then
+            final Question updatedQuestion = h2QuestionRepository.getQuestion(3);
+            assertNotEquals(originalQuestion.correctAnswer(), updatedQuestion.correctAnswer());
+            assertEquals(updatedQuestion.correctAnswer(), "false");
+        }
 
-    @Test
-    void can_update_true_or_false_question_in_database() throws IOException {
-        //given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
-        final Question originalQuestion = h2QuestionRepository.getQuestion(3);
+        @Test
+        void can_update_multiple_choice_question_in_database() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+            final Question originalQuestion = h2QuestionRepository.getQuestion(4);
 
-        //when
-        SimpleTrueOrFalseQuestion simpleTrueOrFalseQuestion = new SimpleTrueOrFalseQuestion(
-                3,
-                "you are well.",
-                false
-        );
-        h2QuestionRepository.updateQuestion(simpleTrueOrFalseQuestion);
+            //when
+            MultipleChoiceQuestion multipleChoiceQuestion = new MultipleChoiceQuestion(
+                    4,
+                    "how old are you today?",
+                    asList(
+                            "35 years old",
+                            "36 years old",
+                            "37 years old"
+                    ),
+                    2
+            );
+            h2QuestionRepository.updateQuestion(multipleChoiceQuestion);
 
-        //then
-        final Question updatedQuestion = h2QuestionRepository.getQuestion(3);
-        assertNotEquals(originalQuestion.correctAnswer(), updatedQuestion.correctAnswer());
-        assertEquals(updatedQuestion.correctAnswer(), "false");
-    }
+            //then
+            final Question updatedQuestion = h2QuestionRepository.getQuestion(4);
+            assertNotEquals(originalQuestion.correctAnswer(), updatedQuestion.correctAnswer());
+            assertEquals(updatedQuestion.correctAnswer(), "37 years old");
+        }
 
-    @Test
-    void can_update_multiple_choice_question_in_database() throws IOException {
-        //given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
-        final Question originalQuestion = h2QuestionRepository.getQuestion(4);
+        @Test
+        void cannot_update_question_of_unknown_type_in_database() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
 
-        //when
-        MultipleChoiceQuestion multipleChoiceQuestion = new MultipleChoiceQuestion(
-                4,
-                "how old are you today?",
-                asList(
-                        "35 years old",
-                        "36 years old",
-                        "37 years old"
-                ),
-                2
-        );
-        h2QuestionRepository.updateQuestion(multipleChoiceQuestion);
+            //when
+            //then
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> h2QuestionRepository.updateQuestion(new UkownQuestionType())
+            );
+        }
 
-        //then
-        final Question updatedQuestion = h2QuestionRepository.getQuestion(4);
-        assertNotEquals(originalQuestion.correctAnswer(), updatedQuestion.correctAnswer());
-        assertEquals(updatedQuestion.correctAnswer(), "37 years old");
-    }
+        @Test
+        void cannot_update_non_existing_question_in_database() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
 
-    @Test
-    void cannot_update_question_of_unknown_type_in_database() throws IOException {
-        //given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+            //when
+            OpenQuestion nonExistingQuestion = new OpenQuestion(
+                    7,
+                    "what is your favourite sports?",
+                    "skiing"
+            );
 
-        //when
-        //then
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> h2QuestionRepository.updateQuestion(new UkownQuestionType())
-        );
-    }
-
-    @Test
-    void cannot_update_non_existing_question_in_database() throws IOException {
-        //given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
-
-        //when
-        OpenQuestion nonExistingQuestion = new OpenQuestion(
-                7,
-                "what is your favourite sports?",
-                "skiing"
-        );
-
-        //then
-        assertThrows(
-                NoSuchElementException.class,
-                () -> h2QuestionRepository.updateQuestion(nonExistingQuestion)
-        );
-    }
-
-    @Test
-    void can_delete_open_question_with_id() throws IOException {
-        //given
-        H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
-        applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
-        final List<Question> originalList = h2QuestionRepository.list();
-
-        //when
-        h2QuestionRepository.deleteQuestionWithId(2);
-
-        //then
-        assertEquals(originalList.size(), 4);
-        assertEquals(h2QuestionRepository.list().size(), 3);
-
+            //then
+            assertThrows(
+                    NoSuchElementException.class,
+                    () -> h2QuestionRepository.updateQuestion(nonExistingQuestion)
+            );
+        }
     }
 
     // Test Utilities
