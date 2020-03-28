@@ -135,11 +135,66 @@ class H2QuestionRepositoryTest {
             final List<Question> originalList = h2QuestionRepository.list();
 
             //when
-            h2QuestionRepository.deleteQuestionWithId(2);
+            Question openQuestion = getQuestionOfType(OpenQuestion.class, originalList);
+            h2QuestionRepository.deleteQuestionWithId(openQuestion.id());
 
             //then
-            assertEquals(originalList.size(), 4);
-            assertEquals(h2QuestionRepository.list().size(), 3);
+            assertEquals(openQuestion.getClass(), OpenQuestion.class);
+            assertTrue(
+                    h2QuestionRepository.list()
+                            .stream()
+                            .map(Question::id)
+                            .noneMatch(id -> id.equals(openQuestion.id()))
+            );
+        }
+
+        @Test
+        void can_delete_true_or_false_question_with_id() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+            final List<Question> originalList = h2QuestionRepository.list();
+
+            //when
+            Question simpleTrueOrFalseQuestion = getQuestionOfType(SimpleTrueOrFalseQuestion.class, originalList);
+            h2QuestionRepository.deleteQuestionWithId(simpleTrueOrFalseQuestion.id());
+
+            //then
+            assertEquals(simpleTrueOrFalseQuestion.getClass(), SimpleTrueOrFalseQuestion.class);
+            assertTrue(
+                    h2QuestionRepository.list()
+                            .stream()
+                            .map(Question::id)
+                            .noneMatch(id -> id.equals(simpleTrueOrFalseQuestion.id()))
+            );
+        }
+
+        @Test
+        void can_delete_multiple_choice_question_with_id() throws IOException {
+            //given
+            H2QuestionRepository h2QuestionRepository = new H2QuestionRepository(dbUrl);
+            applyDatabaseUpdatesFromFile(dbUrl, "questions.sql");
+            final List<Question> originalList = h2QuestionRepository.list();
+
+            //when
+            Question multipleChoiceQuestion = getQuestionOfType(MultipleChoiceQuestion.class, originalList);
+            h2QuestionRepository.deleteQuestionWithId(multipleChoiceQuestion.id());
+
+            //then
+            assertEquals(multipleChoiceQuestion.getClass(), MultipleChoiceQuestion.class);
+            assertTrue(
+                    h2QuestionRepository.list()
+                            .stream()
+                            .map(Question::id)
+                            .noneMatch(id -> id.equals(multipleChoiceQuestion.id()))
+            );
+        }
+
+        private Question getQuestionOfType(Class<? extends Question> questionClass, List<Question> originalList) {
+            return originalList.stream()
+                    .filter(question -> question.getClass() == questionClass)
+                    .findFirst()
+                    .orElseThrow(IllegalStateException::new);
         }
     }
 
@@ -212,8 +267,10 @@ class H2QuestionRepositoryTest {
 
             //when
             //then
-            assertThrows(NoSuchElementException.class,
-                    () -> h2QuestionRepository.getQuestion(7));
+            assertThrows(
+                    NoSuchElementException.class,
+                    () -> h2QuestionRepository.getQuestion(7)
+            );
         }
     }
 
