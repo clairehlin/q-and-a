@@ -1,11 +1,15 @@
 package com.claire.qanda.repository;
 
+import com.claire.qanda.model.MultipleChoiceQuestion;
+import com.claire.qanda.model.OpenQuestion;
 import com.claire.qanda.model.Question;
+import com.claire.qanda.model.SimpleTrueOrFalseQuestion;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
 /*
@@ -17,12 +21,42 @@ where can we call a method in java or a constructor?
  */
 public class SimpleQuestionRepository implements QuestionRepository {
 
+    public static final List<Class<? extends Question>> KNOWN_QUESTION_TYPES = asList(
+            OpenQuestion.class,
+            SimpleTrueOrFalseQuestion.class,
+            MultipleChoiceQuestion.class
+    );
     private final List<Question> db = new ArrayList<>();
 
     @Override
     public Question save(Question question) {
-        db.add(question);
-        return question;
+        Question questionWithId = withId(question);
+        db.add(questionWithId);
+        return questionWithId;
+    }
+
+    private Question withId(Question question) {
+        Integer id = getMaxId() + 1;
+        return withId(question, id);
+    }
+
+    private Question withId(Question question, Integer id) {
+        if (question.getClass() == OpenQuestion.class) {
+            return ((OpenQuestion) question).withId(id);
+        } else if (question.getClass() == SimpleTrueOrFalseQuestion.class) {
+            return ((SimpleTrueOrFalseQuestion) question).withId(id);
+        } else if (question.getClass() == MultipleChoiceQuestion.class) {
+            return ((MultipleChoiceQuestion) question).withId(id);
+        } else {
+            throw new IllegalArgumentException("unknown question type " + question.getClass().getName());
+        }
+    }
+
+    private Integer getMaxId() {
+        return db.stream()
+                .map(Question::id)
+                .max(Integer::compareTo)
+                .orElse(0);
     }
 
     @Override
@@ -47,30 +81,23 @@ public class SimpleQuestionRepository implements QuestionRepository {
         db.remove(question);
     }
 
-    public void deleteQuestionWithId2(Integer id) {
-        for (Question question : db) {
-            if (question.id().equals(id)){
-                db.remove(question);
-            }
-        }
-    }
-
     @Override
     public void updateQuestion(Question question) {
-        for (Question q : db) {
-            if (question.id().equals(q.id())){
-                db.remove(q);
-                db.add(question);
-            }
-        }
+        checkQuestionHasValidType(question);
+       if (
+               db.removeIf(
+                       q -> q.id().equals(question.id())
+               )
+       ) {
+           db.add(question);
+       } else {
+           throw new NoSuchElementException("could not find question with id " + question.id());
+       }
     }
 
-    public Question getOpenQuestion2(Integer id) {
-        for (Question question : db) {
-            if (question.id().equals(id)) {
-                return question;
-            }
-        }
-        throw new NoSuchElementException("cannot find question with id " + id);
+    private void checkQuestionHasValidType(Question question) {
+       if (!KNOWN_QUESTION_TYPES.contains(question.getClass())) {
+           throw new IllegalArgumentException("could not process question of type " + question.getClass().getName());
+       }
     }
 }

@@ -1,14 +1,12 @@
 package com.claire.qanda.services;
 
 import com.claire.qanda.model.Question;
-import com.claire.qanda.model.OpenQuestion;
-import com.claire.qanda.model.Question;
 import com.claire.qanda.repository.QuestionRepository;
 
 import java.util.List;
 
 import static java.util.Collections.unmodifiableList;
-import static java.util.Objects.*;
+import static java.util.Objects.requireNonNull;
 
 public class SimpleQuestionsService implements QuestionsService {
 
